@@ -98,6 +98,26 @@ function onWindowResize() {
 	renderer.setSize( w, h );
 }
 
+function add_ambient_light(){
+
+	var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	dirLight.position.set( 1, 3, 0 );
+	dirLight.castShadow = true;
+	//dirLight.receiveShadow = true;
+
+	dirLight.shadow.mapSize.width = 2048;
+	dirLight.shadow.mapSize.height = 2048;
+	var d = 6;
+	dirLight.shadow.camera.left = - d;
+	dirLight.shadow.camera.right = d;
+	dirLight.shadow.camera.top = d;
+	dirLight.shadow.camera.bottom = - d;
+	dirLight.shadow.camera.far = 7;
+	dirLight.shadow.bias = - 0.01;
+
+	scene.add( dirLight );
+}
+
 function load_scene(gltf_filename,on_load){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
@@ -105,9 +125,16 @@ function load_scene(gltf_filename,on_load){
 		function ( gltf ) {
 			scene = gltf.scene;
 			console.log(`scene object names traversal`);
-			scene.traverse(obj =>console.log(`  - ${obj.name}`) );
+			scene.traverse(obj =>{
+				console.log(`  - ${obj.name}`);
+				//cannot distinguish Light from Camera so apply shadow options to all children without if(obj.type == "Mesh")
+				obj.castShadow = true;
+				obj.receiveShadow = true;
+			} );
 			//The glTF camera is not having the correct window spect ratio and does produce very minimal orbit control movements
 			//camera = gltf.cameras[0];
+			//The glTF light might not have all fine tuning options such as shadow.mapsize
+			//add_ambient_light();
 			camera = create_camera();
 			renderer = create_renderer();
 			controls = add_view_orbit(camera,renderer);
