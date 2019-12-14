@@ -34,3 +34,5 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
 <img src="./02_mouse_down_and_touch/media/demo.gif" width="600">
 
 The design and the on-hover effect from demo 01 are kept. Added is a "mouse down" and "touch start" events. These new events act on the specular effect of the material to give a green shininess.
+
+Note that on the gif, the mouse down event is shown with a yellow spot added by the gif recorder. When the user touches the screen and start moving the scene, the mouse disappears and the touch is visible through the touch gray spot.
