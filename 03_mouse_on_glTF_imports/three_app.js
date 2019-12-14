@@ -3,7 +3,7 @@
 
 var camera, scene, renderer;
 
-var container,controls;
+var controls;
 
 function setBulbState(mesh,state_name,value){
 	if(state_name == "highlight"){
@@ -41,7 +41,35 @@ function setBulbState(mesh,state_name,value){
 		console.log(`${mesh.name} has emissive at ${emit.toString(16)}`);
 }
 
-function add_view_orbit(){
+function create_camera(){
+	var container = document.getElementById('viewer');
+	var w = container.clientWidth;
+	var h = container.clientHeight;
+	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 20 );
+	camera.position.z = -3;
+	camera.position.y = 2;
+	return camera;
+}
+
+function create_renderer(){
+	var container = document.getElementById('viewer');
+	var w = container.clientWidth;
+	var h = container.clientHeight;
+	
+
+	renderer = new THREE.WebGLRenderer( { antialias: true,alpha:true } );
+	renderer.setSize( w, h );
+	renderer.setClearColor( 0x000000, 0.0 );
+	renderer.physicallyCorrectLights = true;
+
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap	
+
+	container.appendChild(renderer.domElement);
+	return renderer;
+}
+
+function add_view_orbit(camera,renderer){
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 	//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
@@ -58,7 +86,7 @@ function add_view_orbit(){
 	controls.maxPolarAngle =  80 * Math.PI / 180;
 
 	controls.rotateSpeed = 0.7;
-
+	return controls;
 }
 
 function onWindowResize() {
@@ -70,44 +98,21 @@ function onWindowResize() {
 	renderer.setSize( w, h );
 }
 
-function add_light(){
-	//var a_light = new THREE.AmbientLight( 0x303030 ); // soft white light
-	//scene.add( a_light );		
-	var h_light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.2 );
-	//h_light.color.setHSL( 0.6, 0.6, 0.6 );
-	//h_light.groundColor.setHSL( 1, 1, 0.75 );
-	h_light.position.set( 0, 500, 0 );
-	//scene.add( h_light );	
-
-	var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-	//dirLight.color.setHSL( 0.1, 1, 0.95 );
-	dirLight.position.set( 100, 300, 0 );
-	dirLight.castShadow = true;
-	dirLight.receiveShadow = true;
-
-	dirLight.shadow.mapSize.width = 2048;
-	dirLight.shadow.mapSize.height = 2048;
-	var d = 600;
-	dirLight.shadow.camera.left = - d;
-	dirLight.shadow.camera.right = d;
-	dirLight.shadow.camera.top = d;
-	dirLight.shadow.camera.bottom = - d;
-	dirLight.shadow.camera.far = 700;
-	dirLight.shadow.bias = - 0.0001;
-
-	scene.add( dirLight );
-}
-
 function load_scene(gltf_filename,on_load){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
 		// called when the resource is loaded
 		function ( gltf ) {
 			scene = gltf.scene;
+			console.log(`scene object names traversal`);
+			scene.traverse(obj =>console.log(`  - ${obj.name}`) );
+			//The glTF camera is not having the correct window spect ratio and does produce very minimal orbit control movements
+			//camera = gltf.cameras[0];
+			camera = create_camera();
+			renderer = create_renderer();
+			controls = add_view_orbit(camera,renderer);
+
 			on_load();
-			//lights are not on the gltf structure but within the scene children
-			//so added manually for now after the scene is loaded
-			add_light();
 		},
 		// called while loading is progressing
 		function ( xhr ) {
@@ -123,41 +128,12 @@ function load_scene(gltf_filename,on_load){
 		}
 	);
 }
-function create_camera(){
-	var w = container.clientWidth;
-	var h = container.clientHeight;
-	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 20 );
-	camera.position.z = -3;
-	camera.position.y = 2;
-}
-
 function init(on_load){
-
 	console.log("three_app> init()");
 
-	//create_scene();
-	load_scene("./scene.gltf",on_load);
-
-	container = document.getElementById('viewer');
-	var w = container.clientWidth;
-	var h = container.clientHeight;
-	
-	create_camera();
-
-	renderer = new THREE.WebGLRenderer( { antialias: true,alpha:true } );
-	renderer.setSize( w, h );
-	renderer.setClearColor( 0x000000, 0.0 );
-
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap	
-	//renderer.shadowMap.renderSingleSided = true;
-
-	container.appendChild(renderer.domElement);
-
-	add_view_orbit();
+	load_scene("./scene_light.gltf",on_load);
 
 	window.addEventListener( 'resize', onWindowResize, false );
-
 }
 
 function animate() {
