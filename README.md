@@ -2,7 +2,11 @@
 This repo contains webGL Three.js based interface demos for interactions with 3d data using mouse and touch
 
 # 01 mouse hover on mesh
-[01 mouse hover on mesh - demo directory](./01_mesh_mouse_on_hover)
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/01_mesh_mouse_on_hover/)
+
+[01 mouse hover on mesh - github directory](./01_mesh_mouse_on_hover)
+
 ## Gif Demo
 
 <img src="./01_mesh_mouse_on_hover/media/demo.gif" width="600">
@@ -18,3 +22,15 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
   
   This list is then provided to the "three_mouse.js" module.
 * On event, the "three_mouse.js" triggers events on mouse entering the mesh and exit from the mesh. These events provide the name of the mesh. The name can be used to call a "three_app.js" function that sets the state according to the event, in this demo the emissive color is changing.
+
+# 02 mouse down and touch
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/02_mouse_down_and_touch/)
+
+[02 mouse down and touch - github directory](./02_mouse_down_and_touch)
+
+## Gif Demo
+
+<img src="./02_mouse_down_and_touch/media/demo.gif" width="600">
+
+The design and the on-hover effect from demo 01 are kept. Added is a "mouse down" and "touch start" events. These new events act on the specular effect of the material to give a green shininess.

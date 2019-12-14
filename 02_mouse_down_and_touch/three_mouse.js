@@ -59,6 +59,21 @@ function process_mouse_event(event_name, event){
 	}
 }
 
+function onTouch(event){
+	event.preventDefault();
+	console.log("onTouch",event);
+	if(event.type == "touchstart"){
+		var obj_name = get_mesh_intersect(event.targetTouches[0].clientX,event.targetTouches[0].clientY);
+		if ( obj_name != "") {
+			send_custom_event("mesh_touch_start",{ type: "light", name: obj_name});
+		}
+	}
+}
+
+function onMouseDown(event){
+	process_mouse_event("mesh_mouse_down",event)
+}
+
 function onMouseMove(event){
 	process_mouse_event("mesh_mouse_move",event)
 }
@@ -71,6 +86,8 @@ function init(l_camera,l_container) {
 
 	raycaster = new Raycaster();
 	container.addEventListener( 'mousemove', onMouseMove, false );
+	container.addEventListener( 'mousedown', onMouseDown, false );
+	container.addEventListener( 'touchstart', onTouch, false );
 }
 
 function SetMeshList(l_mesh_list){

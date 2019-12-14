@@ -46,15 +46,27 @@ function setBulbState(mesh,state_name,value){
 		var emit = mesh.material.emissive;
 	}
 
-	var material = new THREE.MeshPhongMaterial( {
-		color: mesh.material.color,
-		emissive: emit,
-		specular: mesh.material.specular,
-		side: mesh.material.side,
-		flatShading: mesh.material.flatShading
-	});
-	mesh.material = material;
-	console.log(`${mesh.name} has emissive at ${emit.toString(16)}`);
+	if(state_name == "switch"){
+		if(value){
+			var spec = 0x00aa00;
+		}
+		else{
+			var spec = 0x000000;
+		}
+	}
+	else{
+		var spec = mesh.material.specular;
+	}
+
+		var material = new THREE.MeshPhongMaterial( {
+			color: mesh.material.color,
+			emissive: emit,
+			specular: spec,
+			side: mesh.material.side,
+			flatShading: mesh.material.flatShading
+		});
+		mesh.material = material;
+		console.log(`${mesh.name} has emissive at ${emit.toString(16)}`);
 }
 
 function add_controls(){
