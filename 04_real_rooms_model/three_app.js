@@ -6,48 +6,47 @@ var camera, scene, renderer;
 var controls;
 
 function setBulbState(mesh,state_name,value){
-	if(state_name == "highlight"){
-		if(value){
-			var emit = 0x330000;
-		}
-		else{
-			var emit = 0x000000;
-		}
-	}
-	else{
-		var emit = mesh.material.emissive;
-	}
-
 	if(state_name == "switch"){
 		if(value){
-			var spec = 0x00aa00;
+			var emit = new THREE.Color( 0, 0.5, 0 );
 		}
 		else{
-			var spec = 0x000000;
+			var emit = new THREE.Color( 0, 0, 0 );
 		}
 	}
 	else{
-		var spec = mesh.material.specular;
+		if(state_name == "highlight"){
+			if(value){
+				var emit = new THREE.Color( 1, 0, 0 );
+			}
+			else{
+				var emit = new THREE.Color( 0, 0, 0 );
+			}
+		}
+		else{
+			var emit = mesh.material.emissive;
+		}
 	}
+
 
 		var material = new THREE.MeshPhongMaterial( {
 			color: mesh.material.color,
 			emissive: emit,
-			specular: spec,
 			side: mesh.material.side,
 			flatShading: mesh.material.flatShading
 		});
 		mesh.material = material;
-		console.log(`${mesh.name} has emissive at ${emit.toString(16)}`);
+		console.log(`${mesh.name} has emissive at ${emit.getHexString()}`);
 }
 
 function create_camera(){
 	var container = document.getElementById('viewer');
 	var w = container.clientWidth;
 	var h = container.clientHeight;
-	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 20 );
-	camera.position.z = -3;
-	camera.position.y = 2;
+	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 50 );
+	camera.position.y = 10;
+	camera.position.x = 0;
+	camera.position.z = 15;
 	return camera;
 }
 
@@ -80,7 +79,7 @@ function add_view_orbit(camera,renderer){
 	controls.screenSpacePanning = false;
 
 	controls.minDistance = 0.10;
-	controls.maxDistance = 10;
+	controls.maxDistance = 30;
 
 	controls.minPolarAngle =  10 * Math.PI / 180;
 	controls.maxPolarAngle =  80 * Math.PI / 180;
@@ -119,19 +118,61 @@ function add_ambient_light(){
 	scene.add( dirLight );
 }
 
-function load_scene(gltf_filename,on_load){
+function log_scene_info(scene){
+	console.log(`scene object names traversal`);
+	scene.traverse(obj =>{
+		console.log(` - ${obj.type} ; ${obj.name}`);
+		//cannot distinguish Light from Camera so apply shadow options to all children without if(obj.type == "Mesh")
+		obj.castShadow = true;
+		obj.receiveShadow = true;
+	} );
+}
+
+function get_scene_box(scene){
+	let first = true;
+	var box;
+	scene.traverse(obj =>{
+		if(obj.type == "Mesh"){
+			if(first){
+				box = new THREE.Box3().setFromObject(obj);
+				first = false;
+			}else{
+				box.expandByObject(obj)
+			}
+		}
+	} );
+	return box;
+}
+
+function center_scene(scene){
+	console.log(`centering the scene`);
+	var box = get_scene_box(scene);
+	var s = box.getSize();
+	console.log(`scene boxed from (${box.min.x},${box.min.y},${box.min.z}) to (${box.max.x},${box.max.y},${box.max.z}) with size (${s.x},${s.y},${s.z})`);
+	const center_x = (box.max.x - box.min.x)/2;
+	const center_y = (box.max.y - box.min.y)/2;
+	console.log(`shifting the scene by x = ${-center_x} , y = ${-center_y}`);
+	//scene.position.set(scene.position.x - center_x, scene.position.y - center_y, scene.position.z);
+	scene.traverse(obj =>{
+		//though only meshes are taken as input, here everything is shifted as lights shall shift too
+		//hierarchical structure does move end leaves multiple times, so selection of meshes only moved as workaround
+		if(obj.type == "Mesh"){
+			obj.position.set(obj.position.x + center_x, obj.position.y - center_y,obj.position.z);
+		}
+	} );
+	box = get_scene_box(scene);
+	s = box.getSize();
+	console.log(`now scene boxed from (${box.min.x},${box.min.y},${box.min.z}) to (${box.max.x},${box.max.y},${box.max.z}) with size (${s.x},${s.y},${s.z})`);
+}
+
+function load_scene(gltf_filename,user_on_load){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
 		// called when the resource is loaded
 		function ( gltf ) {
 			scene = gltf.scene;
-			console.log(`scene object names traversal`);
-			scene.traverse(obj =>{
-				console.log(`  - ${obj.name}`);
-				//cannot distinguish Light from Camera so apply shadow options to all children without if(obj.type == "Mesh")
-				obj.castShadow = true;
-				obj.receiveShadow = true;
-			} );
+			//log_scene_info(scene);
+			center_scene(scene);
 			//The glTF camera is not having the correct window spect ratio and does produce very minimal orbit control movements
 			//camera = gltf.cameras[0];
 			//The glTF light might not have all fine tuning options such as shadow.mapsize
@@ -139,8 +180,7 @@ function load_scene(gltf_filename,on_load){
 			camera = create_camera();
 			renderer = create_renderer();
 			controls = add_view_orbit(camera,renderer);
-
-			on_load();
+			user_on_load();
 		},
 		// called while loading is progressing
 		function ( xhr ) {
@@ -159,7 +199,7 @@ function load_scene(gltf_filename,on_load){
 function init(on_load){
 	console.log("three_app> init()");
 
-	load_scene("./scene_light.gltf",on_load);
+	load_scene("./rooms.gltf",on_load);
 
 	window.addEventListener( 'resize', onWindowResize, false );
 }

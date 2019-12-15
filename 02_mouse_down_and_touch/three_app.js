@@ -3,7 +3,7 @@
 
 var camera, scene, renderer;
 
-var container,controls;
+var controls;
 
 var bulb_map = {};
 
@@ -90,6 +90,7 @@ function add_controls(){
 }
 
 function onWindowResize() {
+	var container = document.getElementById('viewer');
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	camera.aspect = w / h;
@@ -142,7 +143,7 @@ function add_ambient_light(){
 function init(){
 
 	console.log("three_app> init()");
-	container = document.getElementById('viewer');
+	var container = document.getElementById('viewer');
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	

@@ -63,3 +63,39 @@ Below is a screenshot from the blender Data outliner.
 
 The user here hovers and clicks on the sphere. Default materials have been used in this example to keep it as close to the previous examples as possible.
 
+# 04 real rooms model
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/04_real_rooms_model/)
+
+[01 mouse hover on mesh - github directory](./04_real_rooms_model)
+
+## Parametric modelling
+
+<img src="./04_real_rooms_model/media/Rooms_in_Fusion360.png">
+
+For technical and architectural designs, parametric modelling can come in quite handy. [Fusion360](https://www.autodesk.com/products/fusion-360/overview) is a reference tool when it comes to that. The usage of geometrical sketches reduces the complexity of rooms modelling by simply entering the dimensions.
+
+## Workflow
+
+The workflow is extended as shown below.
+
+<img src="./04_real_rooms_model/media/workflow.png" width="700">
+
+## File Format
+".fbx" is the only common format between both tools that keeps the scale and the hirerchy of objects. The ".stl" and ".obj" pack the whole model in a single mesh.
+
+<table>
+<tr>
+<th width="60%"> Fusion 360 exports format </th>
+<th width="40%"> Blender Import Formats </th>
+</tr>
+
+<tr>
+<td width="60%"> <img src="./04_real_rooms_model/media/fusion_360_exports.png"> </td>
+<td width="40%"> <img src="./04_real_rooms_model/media/blender_2.8_imports.png"> </td>
+</tr>
+</table>
+
+## Gif Demo
+
+<img src="./04_real_rooms_model/media/demo.gif" width="600">
