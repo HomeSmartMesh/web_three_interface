@@ -36,3 +36,30 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
 The design and the on-hover effect from demo 01 are kept. Added is a "mouse down" and "touch start" events. These new events act on the specular effect of the material to give a green shininess.
 
 Note that on the gif, the mouse down event is shown with a yellow spot added by the gif recorder. When the user touches the screen and start moving the scene, the mouse disappears and the touch is visible through the touch gray spot.
+
+# 03 mouse on glTF imports
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/03_mouse_on_glTF_imports/)
+
+[03 mouse on glTF imports - github directory](./03_mouse_on_glTF_imports)
+
+## Workflow
+
+<img src="./03_mouse_on_glTF_imports/media/workflow.png" width="600">
+
+Once familiar with THREE.js concepts, and there is the need to render a more complex scene, it becomes quickly complex to configure every parameter in the code. Looping between editing parameters and display require a reload. That's where professional 3d editing tools coming handy. Thanks to the [glTF](https://en.wikipedia.org/wiki/GlTF) (OpenGL Transmission Format), exporting a scene from [Blender](https://en.wikipedia.org/wiki/Blender_(software)) to THREE.js becomes easy. Not only 3d objects with beshes are exported but also cameras and lights. Note that export include options on blender are required.
+
+Below is a screenshot from the blender Data outliner.
+
+<img src="./03_mouse_on_glTF_imports/media/scene_in_blender.png" width="393">
+
+### current limitations
+* The imported camera does not inherit the aspect ratio from the viewer and has to be adjusted, so reworked anyway.
+* The lights do not have the shadow camera fully configured, and the mapSize set to default, so there is still a need for customisation.
+
+## Gif Demo
+
+<img src="./03_mouse_on_glTF_imports/media/demo.gif" width="600">
+
+The user here hovers and clicks on the sphere. Default materials have been used in this example to keep it as close to the previous examples as possible.
+
