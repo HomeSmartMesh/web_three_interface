@@ -86,16 +86,26 @@ The workflow is extended as shown below.
 
 <table>
 <tr>
-<th width="60%"> Fusion 360 exports format </th>
-<th width="40%"> Blender Import Formats </th>
+<th width="40%"> Fusion 360 exports format </th>
+<th width="30%"> Blender Import Formats </th>
 </tr>
 
 <tr>
-<td width="60%"> <img src="./04_real_rooms_model/media/fusion_360_exports.png"> </td>
-<td width="40%"> <img src="./04_real_rooms_model/media/blender_2.8_imports.png"> </td>
+<td width="40%"> <img src="./04_real_rooms_model/media/fusion_360_exports.png"> </td>
+<td width="30%"> <img src="./04_real_rooms_model/media/blender_2.8_imports.png"> </td>
 </tr>
 </table>
 
 ## Gif Demo
 
 <img src="./04_real_rooms_model/media/demo.gif" width="600">
+
+# 05 interactive lights
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/05_interactive_lights/)
+
+[01 mouse hover on mesh - github directory](./05_interactive_lights)
+
+## Mesh to Light connection
+
+<img src="./05_interactive_lights/media/mesh_to_light.png">

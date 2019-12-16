@@ -20,7 +20,7 @@
                     ],
                     "intensity" : 10,
                     "type" : "point",
-                    "name" : "Office Bulb"
+                    "name" : "Office_Light1"
                 },
                 {
                     "color" : [
@@ -30,7 +30,7 @@
                     ],
                     "intensity" : 10,
                     "type" : "point",
-                    "name" : "Bathroom_Bulb"
+                    "name" : "Bathroom_Light1"
                 }
             ]
         }
@@ -38,6 +38,13 @@
     "scene" : 0,
     "scenes" : [
         {
+            "extras" : {
+                "glTF2ExportSettings" : {
+                    "export_extras" : 1,
+                    "export_format" : "GLTF_EMBEDDED",
+                    "export_lights" : 1
+                }
+            },
             "name" : "Scene",
             "nodes" : [
                 105,
@@ -103,6 +110,10 @@
             "name" : "LivingroomWall:1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 4,
             "name" : "Bathroom_NeighboursWall"
         },
@@ -171,6 +182,10 @@
             "name" : "DoorWall:1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 8,
             "name" : "Bedroom_OfficeWall"
         },
@@ -305,6 +320,10 @@
             "name" : "Hallway:1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 15,
             "name" : "Kitchen_CookWall"
         },
@@ -441,6 +460,10 @@
             "name" : "Livingroom_Base"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 24,
             "name" : "Livingroom_NeighboursWall"
         },
@@ -505,6 +528,10 @@
             "name" : "DoorWall (1):1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 27,
             "name" : "Office_NeighboursWall"
         },
@@ -557,6 +584,10 @@
             "name" : "Office:1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 30,
             "name" : "Toilet_BathroomWall"
         },
@@ -605,6 +636,10 @@
             "name" : "DoorWall (3):1"
         },
         {
+            "extras" : {
+                "type" : "wall",
+                "visible" : "false"
+            },
             "mesh" : 33,
             "name" : "Toilet_LivingroomWall"
         },
@@ -686,7 +721,7 @@
                     "light" : 0
                 }
             },
-            "name" : "Office_Bulb_Light_Orientation",
+            "name" : "Office Light1_Orientation",
             "rotation" : [
                 -0.7071067690849304,
                 0,
@@ -698,7 +733,7 @@
             "children" : [
                 107
             ],
-            "name" : "Office_Bulb_Light",
+            "name" : "Office Light1",
             "translation" : [
                 -1.6984648704528809,
                 2.200000047683716,
@@ -706,6 +741,10 @@
             ]
         },
         {
+            "extras" : {
+                "type" : "light",
+                "light" : "Office_Light1"
+            },
             "mesh" : 35,
             "name" : "Office_Bulb",
             "scale" : [
@@ -720,6 +759,10 @@
             ]
         },
         {
+            "extras" : {
+                "type" : "light",
+                "light" : "Bathroom_Light1"
+            },
             "mesh" : 36,
             "name" : "Bathroom_Bulb",
             "scale" : [
@@ -739,7 +782,7 @@
                     "light" : 1
                 }
             },
-            "name" : "Bathroom_Bulb_Light_Orientation",
+            "name" : "Bathroom Light1_Orientation",
             "rotation" : [
                 -0.7071067690849304,
                 0,
@@ -751,7 +794,7 @@
             "children" : [
                 111
             ],
-            "name" : "Bathroom_Bulb_Light",
+            "name" : "Bathroom Light1",
             "translation" : [
                 -5.114520072937012,
                 2.200000047683716,
@@ -1281,7 +1324,7 @@
             ]
         },
         {
-            "name" : "Office Bulb Mesh",
+            "name" : "Office_Bulb_Mesh",
             "primitives" : [
                 {
                     "attributes" : {
@@ -1294,7 +1337,7 @@
             ]
         },
         {
-            "name" : "Office Bulb Mesh.001",
+            "name" : "Bathroom_Bulb_Mesh",
             "primitives" : [
                 {
                     "attributes" : {

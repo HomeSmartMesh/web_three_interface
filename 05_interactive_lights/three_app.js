@@ -5,10 +5,10 @@ var camera, scene, renderer;
 
 var controls;
 
-function setBulbState(mesh,state_name,value){
+function setBulbState(name,state_name,value){
+	let light_mesh = scene.getObjectByName(name);
 	if(state_name == "switch"){
-		let light_name = mesh.name + "_Light";
-		let light = scene.getObjectByName(light_name);
+		let light = scene.getObjectByName(light_mesh.userData.light);
 		if(value){
 			var emit = new THREE.Color( 0, 0.5, 0 );
 			if(light.children[0].isPointLight){
@@ -39,19 +39,19 @@ function setBulbState(mesh,state_name,value){
 			}
 		}
 		else{
-			var emit = mesh.material.emissive;
+			var emit = light_mesh.material.emissive;
 		}
 	}
 
 
 		var material = new THREE.MeshPhongMaterial( {
-			color: mesh.material.color,
+			color: light_mesh.material.color,
 			emissive: emit,
-			side: mesh.material.side,
-			flatShading: mesh.material.flatShading
+			side: light_mesh.material.side,
+			flatShading: light_mesh.material.flatShading
 		});
-		mesh.material = material;
-		console.log(`${mesh.name} has emissive at ${emit.getHexString()}`);
+		light_mesh.material = material;
+		console.log(`${name} has emissive at ${emit.getHexString()}`);
 
 }
 
@@ -181,6 +181,18 @@ function center_scene(scene){
 	console.log(`now scene boxed from (${box.min.x},${box.min.y},${box.min.z}) to (${box.max.x},${box.max.y},${box.max.z}) with size (${s.x},${s.y},${s.z})`);
 }
 
+function apply_custom_properties(){
+	scene.traverse(obj =>{
+		//though only meshes are taken as input, here everything is shifted as lights shall shift too
+		//hierarchical structure does move end leaves multiple times, so selection of meshes only moved as workaround
+		if(obj.type == "Mesh"){
+			if(obj.userData.visible == "false"){
+				obj.visible = false;
+			}
+		}
+	} );
+}
+
 function load_scene(gltf_filename,user_on_load){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
@@ -192,6 +204,7 @@ function load_scene(gltf_filename,user_on_load){
 			//The glTF camera is not having the correct window spect ratio and does produce very minimal orbit control movements
 			//camera = gltf.cameras[0];
 			//The glTF light might not have all fine tuning options such as shadow.mapsize
+			apply_custom_properties(scene);
 			add_ambient_light();
 			camera = create_camera();
 			renderer = create_renderer();
@@ -243,8 +256,19 @@ function getObjects(objects_names){
 	return mesh_list;
 }
 
+function getLightMeshList(){
+	var mesh_list = [];
+	scene.traverse(obj => {
+		if((obj.type == "Mesh")&&(obj.userData.type == 'light')){
+			mesh_list.push(obj);
+			console.log(`added mesh object as light : ${obj.name}`);
+		}
+	});
+	return mesh_list;
+}
+
 function getCamera(){
 	return camera;
 }
 
-export{init,animate,getObjects,setBulbState,getCamera};
+export{init,animate,getLightMeshList,setBulbState,getCamera};

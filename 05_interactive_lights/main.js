@@ -22,11 +22,7 @@ function main_init(){
 
 function on_load(){
 	mouse.init(three.getCamera());
-	let interactive_meshes_names = [];
-	for(let name in rooms["Lights"]){
-		interactive_meshes_names.push(name);
-	}
-	let interactive_meshes_list = three.getObjects(interactive_meshes_names);
+	let interactive_meshes_list = three.getLightMeshList();
 	mouse.SetMeshList(interactive_meshes_list);
 
 	//convert list to map for more practicale usage in events
@@ -38,13 +34,13 @@ function on_load(){
 function onMeshMouseEnter(e){
 	console.log(`Mesh Mouse Enter in ${e.detail.name}`);
 	document.getElementById('viewer').style.cursor = "pointer";
-	three.setBulbState(interactive_meshes[e.detail.name],"highlight",true);
+	three.setBulbState(e.detail.name,"highlight",true);
 }
 
 function onMeshMouseExit(e){
 	console.log(`Mesh Mouse Exit out of ${e.detail.name}`)
 	document.getElementById('viewer').style.cursor = "default";
-	three.setBulbState(interactive_meshes[e.detail.name],"highlight",false);
+	three.setBulbState(e.detail.name,"highlight",false);
 }
 
 function swap_light_state(name){
@@ -60,12 +56,12 @@ function swap_light_state(name){
 function onMeshMouseDown(e){
 	console.log(`Mesh Mouse Down on ${e.detail.name}`);
 	const switch_to_state = swap_light_state(e.detail.name);
-	three.setBulbState(interactive_meshes[e.detail.name],"switch",switch_to_state);
+	three.setBulbState(e.detail.name,"switch",switch_to_state);
 }
 
 function onMeshTouchStart(e){
 	console.log(`Mesh Touch Start on ${e.detail.name}`)
 	const switch_to_state = swap_light_state(e.detail.name);
-	three.setBulbState(interactive_meshes[e.detail.name],"switch",switch_to_state);
+	three.setBulbState(e.detail.name,"switch",switch_to_state);
 }
 
