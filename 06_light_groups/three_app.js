@@ -5,28 +5,21 @@ var camera, scene, renderer;
 
 var controls;
 
-function setBulbState(name,state_name,value){
-	let light_mesh = scene.getObjectByName(name);
-	if(state_name == "switch"){
-		let light = scene.getObjectByName(light_mesh.userData.light);
+function setBulb_MeshState(light_mesh,state_name,value){
+	if(state_name == "init"){
 		if(value){
-			var emit = new THREE.Color( 0, 0.5, 0 );
-			if(light.children[0].isPointLight){
-				light.children[0].power = 100;
-			}
-			else{
-				console.log(`${light_name} is not a light !!`);
-			}
+			var emit = new THREE.Color( 0, 0, 0.5 );
 		}
 		else{
 			var emit = new THREE.Color( 0, 0, 0 );
-			if(light.children[0].isPointLight){
-				light.children[0].power = 0;
-			}
-			else{
-				console.log(`${light_name} is not a light !!`);
-				light.children[0].power = 0;
-			}
+		}
+	}
+	else if(state_name == "switch"){
+		if(value){
+			var emit = new THREE.Color( 0, 0.5, 0 );
+		}
+		else{
+			var emit = new THREE.Color( 0, 0, 0 );
 		}
 	}
 	else{
@@ -42,8 +35,6 @@ function setBulbState(name,state_name,value){
 			var emit = light_mesh.material.emissive;
 		}
 	}
-
-
 		var material = new THREE.MeshPhongMaterial( {
 			color: light_mesh.material.color,
 			emissive: emit,
@@ -52,7 +43,74 @@ function setBulbState(name,state_name,value){
 		});
 		light_mesh.material = material;
 		console.log(`${name} has emissive at ${emit.getHexString()}`);
+}
 
+function setBulb_LightState(light,state_name,value){
+	if(value){
+		//TODO custom Property for light does not appear on SpotLight object and child is Object3D without userData
+		light.intensity = 10;
+	}
+	else{
+		light.intensity = 0;
+	}
+}
+
+function getLightState(name){
+	const light_mesh = scene.getObjectByName(name);
+	const light = light_mesh.children[0].children[0];
+	if(light.intensity > 0){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+function setBulbState(name,state_name,value){
+	const light_mesh = scene.getObjectByName(name);
+	setBulb_MeshState(light_mesh,state_name,value);
+
+	if(state_name == "switch"){
+			if(light_mesh.children[0].children[0] != "undefined"){
+			const light = light_mesh.children[0].children[0];
+			setBulb_LightState(light,state_name,value);
+		}
+		else{
+			console.log(`light mesh ${name} has no grand child`);
+		}
+	}
+}
+
+/**
+ * 
+ * @param {*} name : the light group name
+ * @return true, if any of the lights are on, otherwise false
+ */
+function getLightGroupState(name){
+	const light_group_mesh = scene.getObjectByName(name);
+	for(let mesh_id in light_group_mesh.children){
+		const mesh = light_group_mesh.children[mesh_id];
+		if(mesh.userData.type == "light"){
+			if(getLightState(mesh.name)){
+				return true;
+			}
+		}
+	};
+	return false;
+}
+
+function setBulbGroupState(name,state_name,value){
+	const light_group_mesh = scene.getObjectByName(name);
+	setBulb_MeshState(light_group_mesh,state_name,value);
+	if(state_name == "switch"){
+			setBulb_LightState(light_group_mesh,state_name,value);
+	}
+
+	light_group_mesh.children.forEach(mesh =>{
+		if(mesh.userData.type == "light"){
+			setBulbState(mesh.name,state_name,value);
+		}
+	});
 }
 
 function create_camera(){
@@ -116,10 +174,9 @@ function onWindowResize() {
 
 function add_ambient_light(){
 
-	var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-	dirLight.position.set( 1, 3, 0 );
+	var dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+	dirLight.position.set( 1, 4, 0 );
 	dirLight.castShadow = true;
-	//dirLight.receiveShadow = true;
 
 	dirLight.shadow.mapSize.width = 2048;
 	dirLight.shadow.mapSize.height = 2048;
@@ -132,16 +189,6 @@ function add_ambient_light(){
 	dirLight.shadow.bias = - 0.01;
 
 	scene.add( dirLight );
-}
-
-function log_scene_info(scene){
-	console.log(`scene object names traversal`);
-	scene.traverse(obj =>{
-		console.log(` - ${obj.type} ; ${obj.name}`);
-		//cannot distinguish Light from Camera so apply shadow options to all children without if(obj.type == "Mesh")
-		//obj.castShadow = true;
-		obj.receiveShadow = true;
-	} );
 }
 
 function get_scene_box(scene){
@@ -168,11 +215,13 @@ function center_scene(scene){
 	const center_x = (box.max.x - box.min.x)/2;
 	const center_y = (box.max.y - box.min.y)/2;
 	console.log(`shifting the scene by x = ${-center_x} , y = ${-center_y}`);
-	scene.position.set(scene.position.x + center_x/100, scene.position.y, scene.position.z);
+	//scene.position.set(scene.position.x - center_x, scene.position.y - center_y, scene.position.z);
 	scene.traverse(obj =>{
 		//though only meshes are taken as input, here everything is shifted as lights shall shift too
 		//hierarchical structure does move end leaves multiple times, so selection of meshes only moved as workaround
-		//if(obj.type == "Mesh"){obj.position.set(obj.position.x + center_x, obj.position.y - center_y,obj.position.z);		}
+		if(obj.type == "Mesh"){
+			obj.position.set(obj.position.x + center_x, obj.position.y - center_y,obj.position.z);
+		}
 	} );
 	box = get_scene_box(scene);
 	s = box.getSize();
@@ -191,17 +240,12 @@ function apply_custom_properties(){
 	} );
 }
 
-function load_scene(gltf_filename,user_on_load){
+function load_scene(user_on_load,gltf_filename){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
 		// called when the resource is loaded
-		function ( gltf ) {
+		gltf => {
 			scene = gltf.scene;
-			//log_scene_info(scene);
-			center_scene(scene);
-			//The glTF camera is not having the correct window spect ratio and does produce very minimal orbit control movements
-			//camera = gltf.cameras[0];
-			//The glTF light might not have all fine tuning options such as shadow.mapsize
 			apply_custom_properties(scene);
 			add_ambient_light();
 			camera = create_camera();
@@ -210,23 +254,16 @@ function load_scene(gltf_filename,user_on_load){
 			user_on_load();
 		},
 		// called while loading is progressing
-		function ( xhr ) {
-	
-			console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-	
-		},
+		xhr => console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ),
 		// called when loading has errors
-		function ( error ) {
-	
-			console.log( 'An error happened' );
-	
-		}
+		error => console.log( 'An error happened',error )
 	);
 }
-function init(on_load,rooms){
+
+function init(on_load,glTF_filename){
 	console.log("three_app> init()");
 
-	load_scene(rooms["glTF_Model"],on_load);
+	load_scene(on_load,glTF_filename);
 
 	window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -240,26 +277,12 @@ function animate() {
 
 }
 
-function getObjects(objects_names){
-	var mesh_list = [];
-	objects_names.forEach(name => {
-		let mesh = scene.getObjectByName(name);
-		if(typeof mesh !== 'undefined'){
-			mesh_list.push(mesh);
-		}
-		else{
-			console.log(`No object named ${name} in 'scene'`);
-		}
-	})
-	return mesh_list;
-}
-
-function getLightMeshList(){
+function getMouseMeshList(){
 	var mesh_list = [];
 	scene.traverse(obj => {
-		if((obj.type == "Mesh")&&(obj.userData.type == 'light')){
+		if((obj.type == "Mesh")&&(obj.userData.mouseEvent == 'true')){
 			mesh_list.push(obj);
-			console.log(`added mesh object as light : ${obj.name}`);
+			console.log(`three_app> mesh '${obj.name}' with mouseEvent`);
 		}
 	});
 	return mesh_list;
@@ -269,4 +292,4 @@ function getCamera(){
 	return camera;
 }
 
-export{init,animate,getLightMeshList,setBulbState,getCamera};
+export{init,animate,getMouseMeshList,setBulbState,setBulbGroupState,getLightState,getLightGroupState,getCamera};

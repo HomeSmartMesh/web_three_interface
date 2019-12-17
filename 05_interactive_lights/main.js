@@ -20,6 +20,16 @@ function main_init(){
 	window.addEventListener( 'mesh_touch_start', onMeshTouchStart, false );
 }
 
+function swap_light_state(name){
+	if(typeof rooms_light_state[name] == "undefined"){
+		rooms_light_state[name] = true;
+	}
+	else{
+		rooms_light_state[name] = ! rooms_light_state[name];
+	}
+	return rooms_light_state[name];
+}
+
 function on_load(){
 	mouse.init(three.getCamera());
 	let interactive_meshes_list = three.getLightMeshList();
@@ -27,6 +37,8 @@ function on_load(){
 
 	//convert list to map for more practicale usage in events
 	interactive_meshes_list.forEach(mesh => interactive_meshes[mesh.name] = mesh);
+	interactive_meshes_list.forEach(mesh => swap_light_state(mesh.name));
+	interactive_meshes_list.forEach(mesh => three.setBulbState(mesh.name,"highlight",true));
 	
 	three.animate();
 }
@@ -41,16 +53,6 @@ function onMeshMouseExit(e){
 	console.log(`Mesh Mouse Exit out of ${e.detail.name}`)
 	document.getElementById('viewer').style.cursor = "default";
 	three.setBulbState(e.detail.name,"highlight",false);
-}
-
-function swap_light_state(name){
-	if(typeof rooms_light_state[name] == "undefined"){
-		rooms_light_state[name] = true;
-	}
-	else{
-		rooms_light_state[name] = ! rooms_light_state[name];
-	}
-	return rooms_light_state[name];
 }
 
 function onMeshMouseDown(e){

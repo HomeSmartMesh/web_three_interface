@@ -104,8 +104,20 @@ The workflow is extended as shown below.
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/05_interactive_lights/)
 
-[01 mouse hover on mesh - github directory](./05_interactive_lights)
+[05 interactive lights - github directory](./05_interactive_lights)
 
 ## Mesh to Light connection
+Custom properties are input from blender and can be transferred within the glTF file by checking their export option. Here they've been used to reference which mesh event are going to act on which light to switch it on and off.
 
-<img src="./05_interactive_lights/media/mesh_to_light.png">
+<img src="./05_interactive_lights/media/mesh_to_light.png" width="600">
+
+## Gif Demo
+
+<img src="./05_interactive_lights/media/demo.gif" width="600">
+
+# 06 light groups
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/06_light_groups/)
+
+[06 light groups - github directory](./06_light_groups)
+
