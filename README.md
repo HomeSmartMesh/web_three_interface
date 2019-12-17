@@ -121,3 +121,23 @@ Custom properties are input from blender and can be transferred within the glTF 
 
 [06 light groups - github directory](./06_light_groups)
 
+## Mesh to light with Parenting
+
+<img src="./06_light_groups/media/mesh_light_child.png" width="600">
+
+A new concept different from the previous example 05, is to simplify the mesh used to activate the light, and the light obejct connected without custom properties, rather with the light being a child object of the mesh within the blender model and as imported in the three.js scene.
+
+As the mouse interaction is not specific to lights but could be applied to any sort of mesh, it is now explicitely set as custom property "mouseEvent"
+
+## Light grouping
+
+<img src="./06_light_groups/media/grouping_lights.png" width="600">
+
+Multiple lights having a similar blender structure as in the previous paragraph, can be gruoped under a common parent (in this figure above 5 of them). The parent should have as custom property "lightgroup" and also "mouseEvent" in order to receive a mouse interaction. The three_app provide functions to manage the light group by forwarding Set functions to the children lights. 
+
+Note the logic of group light click is defined to switch off all lights if any of the children is on.
+
+## Gif Demo
+
+<img src="./06_light_groups/media/demo.gif" width="600">
+
