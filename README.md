@@ -141,3 +141,38 @@ Note the logic of group light click is defined to switch off all lights if any o
 
 <img src="./06_light_groups/media/demo.gif" width="600">
 
+# 07 interactive heating
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/07_interactive_heating/)
+
+[07 interactive heating - github directory](./07_interactive_heating)
+
+## Features
+Added features in this demo:
+* Shadows
+* Complete Home lighting setup
+* Heating as separate interactive type
+
+The heating has the custom parameter `type=Heating`. It also features an mqtt topic for future extensions. Its separate type allow handling it through a different module than the lighting.
+
+## Issues and limitations
+
+### glTF blender to three.js limitation
+
+hit a bug when exporting a rotated child of a scaled mesh, the child mesh gets a weired distorded shaped in comparision to blender visualisation.
+
+### webGL shadows limitations
+
+It was not possible to enable casting shadows with all lights that exceed a number of 16, so the spots got their castShadow set to false. 
+
+    three.min.js:82 THREE.WebGLProgram: shader error:  0 35715 false gl.getProgramInfoLog FRAGMENT shader texture image units count exceeds MAX_TEXTURE_IMAGE_UNITS(16)
+
+### self shadows on flat surface
+
+When enabling both casting shadows and receiving shadows on the same flat surface, the below aliasing appears. So shadows were restricted to casting from walls and receiving by floors.
+
+<img src="./07_interactive_heating/media/aliasing.png" width="600">
+
+## Gif Demo
+
+<img src="./07_interactive_heating/media/demo.gif" width="600">
