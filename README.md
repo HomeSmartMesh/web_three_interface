@@ -2,14 +2,12 @@
 This repo contains webGL Three.js based interface demos for interactions with 3d data using mouse and touch
 
 # 01 mouse hover on mesh
+<img src="./01_mesh_mouse_on_hover/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/01_mesh_mouse_on_hover/)
 
 [01 mouse hover on mesh - github directory](./01_mesh_mouse_on_hover)
 
-## Gif Demo
-
-<img src="./01_mesh_mouse_on_hover/media/demo.gif" width="600">
 
 The user moves the mouse over the sphere object which changes color on enter and on exit events.
 
@@ -24,20 +22,20 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
 * On event, the "three_mouse.js" triggers events on mouse entering the mesh and exit from the mesh. These events provide the name of the mesh. The name can be used to call a "three_app.js" function that sets the state according to the event, in this demo the emissive color is changing.
 
 # 02 mouse down and touch
+<img src="./02_mouse_down_and_touch/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/02_mouse_down_and_touch/)
 
 [02 mouse down and touch - github directory](./02_mouse_down_and_touch)
 
-## Gif Demo
-
-<img src="./02_mouse_down_and_touch/media/demo.gif" width="600">
 
 The design and the on-hover effect from demo 01 are kept. Added is a "mouse down" and "touch start" events. These new events act on the specular effect of the material to give a green shininess.
 
 Note that on the gif, the mouse down event is shown with a yellow spot added by the gif recorder. When the user touches the screen and start moving the scene, the mouse disappears and the touch is visible through the touch gray spot.
 
 # 03 mouse on glTF imports
+<img src="./03_mouse_on_glTF_imports/media/demo.gif" width="600">
+
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/03_mouse_on_glTF_imports/)
 
@@ -57,13 +55,10 @@ Below is a screenshot from the blender Data outliner.
 * The imported camera does not inherit the aspect ratio from the viewer and has to be adjusted, so reworked anyway.
 * The lights do not have the shadow camera fully configured, and the mapSize set to default, so there is still a need for customisation.
 
-## Gif Demo
-
-<img src="./03_mouse_on_glTF_imports/media/demo.gif" width="600">
-
 The user here hovers and clicks on the sphere. Default materials have been used in this example to keep it as close to the previous examples as possible.
 
 # 04 real rooms model
+<img src="./04_real_rooms_model/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/04_real_rooms_model/)
 
@@ -96,11 +91,8 @@ The workflow is extended as shown below.
 </tr>
 </table>
 
-## Gif Demo
-
-<img src="./04_real_rooms_model/media/demo.gif" width="600">
-
 # 05 interactive lights
+<img src="./05_interactive_lights/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/05_interactive_lights/)
 
@@ -111,11 +103,8 @@ Custom properties are input from blender and can be transferred within the glTF 
 
 <img src="./05_interactive_lights/media/mesh_to_light.png" width="600">
 
-## Gif Demo
-
-<img src="./05_interactive_lights/media/demo.gif" width="600">
-
 # 06 light groups
+<img src="./06_light_groups/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/06_light_groups/)
 
@@ -137,11 +126,8 @@ Multiple lights having a similar blender structure as in the previous paragraph,
 
 Note the logic of group light click is defined to switch off all lights if any of the children is on.
 
-## Gif Demo
-
-<img src="./06_light_groups/media/demo.gif" width="600">
-
 # 07 interactive heating
+<img src="./07_interactive_heating/media/demo.gif" width="600">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/07_interactive_heating/)
 
@@ -173,6 +159,3 @@ When enabling both casting shadows and receiving shadows on the same flat surfac
 
 <img src="./07_interactive_heating/media/aliasing.png" width="600">
 
-## Gif Demo
-
-<img src="./07_interactive_heating/media/demo.gif" width="600">
