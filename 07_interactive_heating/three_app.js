@@ -277,7 +277,6 @@ function apply_shadows(scene){
 		if(obj.type == "Mesh"){
 			if(obj.userData.type == "wall"){
 				obj.castShadow = true;
-				obj.receiveShadow = true;
 			}
 			else if(obj.userData.type == "floor"){
 				obj.receiveShadow = true;
