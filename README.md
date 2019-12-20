@@ -5,6 +5,8 @@ This repo contains webGL Three.js based interface demos for interactions with 3d
 
 <img src="./08_parameter_to_animation/media/demo.gif">
 
+[Live demo](https://homesmartmesh.github.io/web_three_interface/08_parameter_to_animation/)
+
 We see above the user moving the gui.dat parameter which is rotating the object. Although rotating an object in three.js is quite simple, this demo shows how to do this through an animation. That gives the advantage of abstracting the animation design from the parameter that will be controlling the animation.
 
 ## blender side
