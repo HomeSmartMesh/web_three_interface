@@ -1,6 +1,26 @@
 # Introduction
 This repo contains webGL Three.js based interface demos for interactions with 3d data using mouse and touch. This readme does not go through the different samples in the numeric order as the most interesting have been presented first.
 
+# 08 parameter to animation
+
+<img src="./08_parameter_to_animation/media/demo.gif">
+
+We see above the user moving the gui.dat parameter which is rotating the object. Although rotating an object in three.js is quite simple, this demo shows how to do this through an animation. That gives the advantage of abstracting the animation design from the parameter that will be controlling the animation.
+
+## blender side
+Due to a three.js limitation (apparently), it was not possible to identify which object has which animation although it is available in the glTF and known by the internal three.js objects somehow. This was overcome by using a custom parameter on the object that mention the animation name:
+
+<img src="./08_parameter_to_animation/media/animation_name.png" width="600">
+
+## animation hint
+For controlled animation type, the animation is expected to be linear otherwise any distorsion will impact the parameter mapping as well :
+
+<img src="./08_parameter_to_animation/media/linear_animation.png" width="600">
+
+## design param to animation
+
+<img src="./08_parameter_to_animation/media/param_2_anim.png" width="600">
+
 # Interaction with real lights
 
 This repository is intended as boiler plate to showcase the interactions with a 3d home model. For abstraction purpose, it does not include any connection to real devices or network libraries. Such usage is developed within this project below that has the same development model and license:
@@ -168,3 +188,8 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
   This list is then provided to the "three_mouse.js" module.
 * On event, the "three_mouse.js" triggers events on mouse entering the mesh and exit from the mesh. These events provide the name of the mesh. The name can be used to call a "three_app.js" function that sets the state according to the event, in this demo the emissive color is changing.
 
+# Dependencies
+
+* three.js
+* jQuery
+* [dat.gui](https://github.com/dataarts/dat.gui)
