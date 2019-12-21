@@ -1,5 +1,5 @@
-//import "../three/three.module.js";
-//import "../three/OrbitControls.js";
+//import "../libs/three/three.module.js";
+//import "../libs/three/OrbitControls.js";
 
 var camera, scene, renderer;
 

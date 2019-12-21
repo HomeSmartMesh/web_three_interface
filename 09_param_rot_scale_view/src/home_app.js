@@ -2,32 +2,15 @@ import * as three from "./three_app.js";
 import * as mouse from "./three_mouse.js";
 
 var rooms_light_state = {};
-
 var hue_mesh_name = {};
+var gui;
 
 function send_custom_event(event_name,data){
 	var event = new CustomEvent(event_name, {detail:data});
 	window.dispatchEvent(event);
 }
 
-function init_gui_controls(){
-	var ModifyParam = function() {
-		this.pull = 0.5;
-	  };
-	window.onload = function() {
-		var config = new ModifyParam();
-		var gui = new dat.GUI();
-		var controller = gui.add(config, 'pull',0,1);
-		controller.onChange(value => {
-			send_custom_event("three_param",{name:"Axis", param:"pull",val:value});
-		});
-	  };
-}
-
 function init(){
-
-	init_gui_controls();
-
 	$.getJSON("home.json", function(home_data) {
 		three.init(on_load,home_data.glTF_model);
 
@@ -41,7 +24,27 @@ function init(){
 	
 }
 
+function init_dat_gui(){
+	let Camelon_views = three.get_obj_views("Cameleon");
+	let config = {
+		pull : 0.5,
+		heat : 0.1,
+		view : Camelon_views[0]
+	};
+	gui = new dat.GUI();
+	let controller_pull = gui.add(config, 'pull',0,1);
+	let controller_heat = gui.add(config, 'heat',0,1);
+	let controller_views = gui.add(config, 'view',Camelon_views);
+	controller_pull.onChange(value => {send_custom_event("three_param",{name:"Axis", param:"pull",val:value})});
+	controller_heat.onChange(value => {send_custom_event("three_param",{name:"Mercure", param:"heat",val:value})});
+	controller_views.onChange(value => {send_custom_event("three_param",{name:"Cameleon", val:value})});
+}
+
+//in this callback, three is ready
 function on_load(){
+
+	init_dat_gui();
+
 	mouse.init(three.getCamera());
 	const mouse_mesh_list = three.getMouseMeshList();
 	mouse.SetMeshList(mouse_mesh_list);
@@ -63,6 +66,7 @@ function on_load(){
 	});
 
 	send_custom_event("three_param",{name:"Axis", param:"pull",val:0.5});
+	send_custom_event("three_param",{name:"Cameleon", val:"plate1"});
 
 	three.animate();
 

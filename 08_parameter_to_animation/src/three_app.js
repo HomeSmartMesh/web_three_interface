@@ -1,5 +1,5 @@
-//import "../three/three.module.js";
-//import "../three/OrbitControls.js";
+//import "../libs/three/three.module.js";
+//import "../libs/three/OrbitControls.js";
 
 var camera, scene, renderer;
 var controls;
@@ -365,7 +365,7 @@ function onParamUpdate(e){
 		time = 0;
 	}
 	else if(time >=duration){
-		time = duration -  0.00001;//This is a bug in THREE animation as duration value turns back animation to 0 and not clear how to set it at the end of the animation
+		time = duration -  0.00001;//This is a bug in THREE animation as when value = duration, it turns back animation to 0 and not clear how to set it at the end of the animation
 	}
 	mixer.setTime(time);
 }

@@ -2,8 +2,9 @@
 //import "../libs/three/OrbitControls.js";
 
 var camera, scene, renderer;
-
 var controls;
+
+var anim_params = {};
 
 function setBulb_MeshState(light_mesh,state_name,value){
 	if(state_name == "init"){
@@ -42,37 +43,7 @@ function setBulb_MeshState(light_mesh,state_name,value){
 			flatShading: light_mesh.material.flatShading
 		});
 		light_mesh.material = material;
-		console.log(`${name} has emissive at ${emit.getHexString()}`);
-}
-
-function getHeatState(heater_name){
-	const heater_mesh = scene.getObjectByName(heater_name);
-	if(heater_mesh.material.emissive == "undefined"){
-		return false;
-	}else if(heater_mesh.material.emissive.r == 0){
-		return false;
-	}
-	else{
-		return true;
-	}
-}
-
-function setHeatState(heater_name,value){
-	const heater_mesh = scene.getObjectByName(heater_name);
-	if(value){
-		var emit = new THREE.Color( 0.7, 0, 0 );
-	}
-	else{
-		var emit = new THREE.Color( 0, 0, 0.8 );
-	}
-	var material = new THREE.MeshPhongMaterial( {
-		color: heater_mesh.material.color,
-		emissive: emit,
-		side: heater_mesh.material.side,
-		flatShading: heater_mesh.material.flatShading
-	});
-	heater_mesh.material = material;
-	console.log(`${name} has emissive at ${emit.getHexString()}`);
+		//console.log(`${name} has emissive at ${emit.getHexString()}`);
 }
 
 function setBulb_LightState(light,state_name,value){
@@ -148,9 +119,9 @@ function create_camera(){
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 50 );
-	camera.position.y = 10;
+	camera.position.y = 5;
 	camera.position.x = 0;
-	camera.position.z = 15;
+	camera.position.z = 5;
 	return camera;
 }
 
@@ -260,7 +231,7 @@ function center_scene(scene){
 	console.log(`now scene boxed from (${box.min.x},${box.min.y},${box.min.z}) to (${box.max.x},${box.max.y},${box.max.z}) with size (${s.x},${s.y},${s.z})`);
 }
 
-function apply_custom_properties(){
+function apply_custom_visibility(scene){
 	scene.traverse(obj =>{
 		//though only meshes are taken as input, here everything is shifted as lights shall shift too
 		//hierarchical structure does move end leaves multiple times, so selection of meshes only moved as workaround
@@ -268,6 +239,54 @@ function apply_custom_properties(){
 			if(obj.userData.visible == "false"){
 				obj.visible = false;
 			}
+		}
+	} );
+}
+
+function set_obj_view(obj,view_name){
+	console.log(`three_app> set_obj_view() ${obj.name} to : ${view_name}`);
+	obj.userData.view = view_name;
+	let view_set = false;
+	obj.children.forEach(child => {
+		//console.log(` - child : ${child.name}`);
+		if(child.name == view_name){
+			child.visible = true;
+			view_set = true;
+		}
+		else{
+			child.visible = false;
+		}
+	});
+	if(!view_set){
+		console.error(`${view_name} is not a view in ${obj.name}`);
+	}
+}
+
+function get_obj_views(obj_name){
+	const obj = scene.getObjectByName(obj_name);
+	console.log(`three_app> get_obj_views() for ${obj.name}`);
+	if(typeof obj.userData.view != "undefined"){
+		let result = [];
+		obj.children.forEach(child => {
+			result.push(child.name);
+		});
+		return result;
+	}
+	else{
+		console.error(`${obj.name} has no 'view' as custom property`);
+		return [];
+	}
+}
+
+function apply_custom_view(scene){
+	scene.traverse(obj =>{
+		if(typeof obj.userData.view != "undefined"){
+			console.log(`${obj.name} has ${obj.children.length} views :`);
+			set_obj_view(obj,obj.userData.view);
+			anim_params[obj.name] = {};
+			anim_params[obj.name]["type"] = "view";
+			anim_params[obj.name]["object"] = obj;
+			anim_params[obj.name]["view"] = obj.userData.view;
 		}
 	} );
 }
@@ -289,19 +308,61 @@ function apply_shadows(scene){
 	});
 }
 
+function back(){
+
+	gltf.animations.forEach(clip =>{
+
+		console.log(`clip '${clip.name}' :`);
+		clip.tracks.forEach(track =>{
+			console.log(` - KeyframeTrack '${track.name}' with ${track.times.length} times`);
+		});
+		const obj_mixer = new THREE.AnimationMixer(scene.getObjectByName("Axis"));
+		const animAction = obj_mixer.clipAction(clip);
+		animAction.play();
+		obj_mixer.setTime(2);
+
+	});
+}
+
+function apply_param_animations(gltf,scene){
+	scene.traverse(obj =>{
+		if(obj.type == "Mesh"){
+			if(typeof obj.userData.parameter != "undefined"){
+				const clip_name = obj.userData.parameter;
+				const clip = THREE.AnimationClip.findByName(gltf.animations,clip_name);
+				if(typeof clip.name == "undefined"){console.error(`clip ${clip_name} does not exist`);}
+				console.log(`Mesh '${obj.name}' has animation '${clip.name}'`);
+				const obj_mixer = new THREE.AnimationMixer(obj);
+				const animAction = obj_mixer.clipAction(clip);
+				animAction.play();
+				obj_mixer.setTime(0);
+				anim_params[obj.name] = {};
+				anim_params[obj.name]["type"] = "mixer";
+				anim_params[obj.name][clip_name] = {};
+				anim_params[obj.name][clip_name]["mixer"] = obj_mixer;
+				anim_params[obj.name][clip_name]["duration"] = clip.duration;
+			}
+		}
+	});
+	
+}
+
 function load_scene(user_on_load,gltf_filename){
 	var loader = new THREE.GLTFLoader();
 	loader.load(gltf_filename,
 		// called when the resource is loaded
 		gltf => {
 			scene = gltf.scene;
-			apply_custom_properties(scene);
+			apply_custom_visibility(scene);
+			apply_param_animations(gltf,scene);
+			apply_custom_view(scene);
 			apply_shadows(scene);
 			add_ambient_light();
 			camera = create_camera();
 			renderer = create_renderer();
 			controls = add_view_orbit(camera,renderer);
 			user_on_load();
+			//setParam("Axis","pull",4);
 		},
 		// called while loading is progressing
 		xhr => console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ),
@@ -316,6 +377,7 @@ function init(on_load,glTF_filename){
 	load_scene(on_load,glTF_filename);
 
 	window.addEventListener( 'resize', onWindowResize, false );
+	window.addEventListener( 'three_param', onParamUpdate, false );
 }
 
 function animate() {
@@ -332,7 +394,7 @@ function getMouseMeshList(){
 	scene.traverse(obj => {
 		if((obj.type == "Mesh")&&(obj.userData.mouseEvent == 'true')){
 			mesh_list.push(obj);
-			console.log(`three_app> mesh '${obj.name}' with mouseEvent`);
+			//console.log(`three_app> mesh '${obj.name}' with mouseEvent`);
 		}
 	});
 	return mesh_list;
@@ -342,4 +404,37 @@ function getCamera(){
 	return camera;
 }
 
-export{init,animate,getMouseMeshList,setBulbState,setBulbGroupState,getLightState,getLightGroupState,getCamera,setHeatState,getHeatState};
+function onParamUpdate(e){
+
+	const obj_name = e.detail.name;
+	const param_name = e.detail.param;
+	const val = e.detail.val;
+	if(anim_params[obj_name].type == "mixer"){
+		const mixer = anim_params[obj_name][param_name].mixer;
+		const duration = anim_params[obj_name][param_name].duration;
+		let time = val * duration;
+		if(time<0){
+			time = 0;
+		}
+		else if(time >=duration){
+			time = duration -  0.00001;//This is a bug in THREE animation as duration value turns back animation to 0 and not clear how to set it at the end of the animation
+		}
+		mixer.setTime(time);
+	}
+	else{
+		const obj = anim_params[obj_name].object;
+		set_obj_view(obj,val);
+	}
+}
+
+export{
+		init,
+		animate,
+		getMouseMeshList,
+		setBulbState,
+		setBulbGroupState,
+		getLightState,
+		getLightGroupState,
+		getCamera,
+		get_obj_views
+	};

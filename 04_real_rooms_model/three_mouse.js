@@ -2,7 +2,7 @@ import {
 	Matrix4,
 	Raycaster,
 	Vector2
-} from "../three/three.module.js";
+} from "../../libs/three/three.module.js";
 
 
 var camera;
