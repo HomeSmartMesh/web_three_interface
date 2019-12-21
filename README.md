@@ -9,6 +9,8 @@ https://github.com/HomeSmartMesh/smart_home_3d_webapp
 
 <img src="./smart_home_3d_webapp/demo1.gif">
 
+Now back to the description of this repository content :
+
 # 01 mouse hover on mesh
 <img src="./01_mesh_mouse_on_hover/media/demo.gif" width="600">
 
@@ -218,3 +220,12 @@ We will be talking about "parameters" in stead of animations as it is unfortunat
 ### glTF limitations : No support for material animations
 * https://github.com/KhronosGroup/glTF-Blender-Exporter/issues/335
 * https://github.com/KhronosGroup/glTF/pull/1301#issuecomment-422932982
+
+## blender structure of the selectable view as parameter
+<img src="./09_param_rot_scale_view/media/views.png" width="600">
+
+## Usage
+To select one view, it is enough to send a javascript custom event with the name of the object to be updated and as value, the child state to be assigned :
+
+    send_custom_event("three_param",{name:"Cameleon", val:"plate1"})
+
