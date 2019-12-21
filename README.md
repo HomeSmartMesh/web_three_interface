@@ -204,28 +204,48 @@ For controlled animation type, the animation is expected to be linear otherwise 
 <img src="./08_parameter_to_animation/media/param_2_anim.png" width="600">
 
 
-# 09 Rotation Scale View parameters
+# 09 Rotation Scale State parameters
 
 <img src="./09_param_rot_scale_view/media/demo.gif">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/09_param_rot_scale_view/)
 
-[09 Rotation Scale View parameters - github directory](./09_param_rot_scale_view)
+[09 Rotation Scale State parameters - github directory](./09_param_rot_scale_view)
 
-In this demo above we see the user acting on the dat.gui elements to modify the rotation of the first item through the "pull" parameter, the scale of a rectangle within the second item through the "heat parameter" and updating the view of the third item through the drop down "view" menu
+In this demo above we see the user acting on the dat.gui elements to modify the rotation of the first item through the "pull" parameter, the scale of a rectangle within the second item through the "heat parameter" and updating the state of the third item through the drop down "view" menu
 
 ## Animating colors
-We will be talking about "parameters" in stead of animations as it is unfortunately not possible to map all required parameters modifications to animations. One of the main goals of this project is to animate color and that is simply not yet supported by the .glTF standard. Therefore, in a first step, a multiple views concept is introduced where each view can be selected by its name, and each view is a completely different child mesh that can have a different geometry and material. Note that modifying geometry only is not required here as it could be done through animation, but there's no other way to assign more than one material to one mesh.
+We will be talking about "parameters" in stead of animations as it is unfortunately not possible to map all required parameters modifications to animations. One of the main goals of this project is to animate color and that is simply not yet supported by the .glTF standard. Therefore, in a first step, a multiple states concept is introduced where each state can be selected by its name, and each state is a completely different child mesh that can have a different geometry and material. Note that modifying geometry only is not required here as it could be done through animation, but there's no other way to assign more than one material to one mesh.
 
 ### glTF limitations : No support for material animations
 * https://github.com/KhronosGroup/glTF-Blender-Exporter/issues/335
 * https://github.com/KhronosGroup/glTF/pull/1301#issuecomment-422932982
 
-## blender structure of the selectable view as parameter
-<img src="./09_param_rot_scale_view/media/views.png" width="600">
+## blender structure of the selectable state as parameter
+<img src="./09_param_rot_scale_view/media/states.png" width="600">
 
 ## Usage
-To select one view, it is enough to send a javascript custom event with the name of the object to be updated and as value, the child state to be assigned :
+To select one state, it is enough to send a javascript custom event with the name of the object to be updated and as value, the child state to be assigned :
 
     send_custom_event("three_param",{name:"Cameleon", val:"plate1"})
+
+# 10 More States and material color animation
+
+<img src="./10_parameter_to_color/media/demo.gif" width="600">
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/10_parameter_to_color/)
+
+[10 More States and material color animation - github directory](./10_parameter_to_color)
+
+In this demo, the previous example is extended with another state. Any number of states can actually be set. A method for color variation is also acheived. This change only concerns the material RGB color, not the speculiar or others. Here a parameter is interpolating two colors, but it is possible even to have any number of colors, where each will have an interpolation weight.
+
+## Blender structure of the animated color object
+
+<img src="./10_parameter_to_color/media/colors.png" width=600>
+
+## Usage
+
+    send_custom_event("three_param",{name:"Cameleon", appear1:0.3, appear2:0.7})
+
+in order to have a coherent result, the sum of the given parameters is expected to be equal to one.
 
