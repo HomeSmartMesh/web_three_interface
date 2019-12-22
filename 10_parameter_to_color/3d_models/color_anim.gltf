@@ -92,7 +92,8 @@
         },
         {
             "extras" : {
-                "view" : "state1"
+                "view" : "state1",
+                "mouseEvent" : "true"
             },
             "mesh" : 0,
             "name" : "state1",
@@ -142,6 +143,9 @@
             ]
         },
         {
+            "extras" : {
+                "mouseEvent" : "true"
+            },
             "mesh" : 3,
             "name" : "appear1",
             "scale" : [
