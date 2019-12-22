@@ -31,12 +31,6 @@ This mouse hover example is easily reusable as it is split in modules. The "thre
   This list is then provided to the "three_mouse.js" module.
 * On event, the "three_mouse.js" triggers events on mouse entering the mesh and exit from the mesh. These events provide the name of the mesh. The name can be used to call a "three_app.js" function that sets the state according to the event, in this demo the emissive color is changing.
 
-# Dependencies
-
-* three.js
-* jQuery
-* [dat.gui](https://github.com/dataarts/dat.gui)
-
 # 02 mouse down and touch
 <img src="./02_mouse_down_and_touch/media/demo.gif" width="600">
 
@@ -227,7 +221,9 @@ We will be talking about "parameters" in stead of animations as it is unfortunat
 ## Usage
 To select one state, it is enough to send a javascript custom event with the name of the object to be updated and as value, the child state to be assigned :
 
-    send_custom_event("three_param",{name:"Cameleon", val:"plate1"})
+```javascript
+    send_custom_event("three_param",{name:"Cameleon", val:"plate1"});
+```
 
 # 10 More States and material color animation
 
@@ -245,7 +241,18 @@ In this demo, the previous example is extended with another state. Any number of
 
 ## Usage
 
-    send_custom_event("three_param",{name:"Cameleon", appear1:0.3, appear2:0.7})
+```javascript
+    send_custom_event("three_param",{name:"Cameleon", appear1:0.3, appear2:0.7});
+```
 
 in order to have a coherent result, the sum of the given parameters is expected to be equal to one.
+
+
+# Module Dependencies
+
+* [jsm/dat.gui.module.js](https://raw.githubusercontent.com/dataarts/dat.gui/v0.7.6/build/dat.gui.module.js)
+
+* [jsm/three/three.module.js](https://raw.githubusercontent.com/mrdoob/three.js/r111/build/three.module.js)
+* [jsm/three/OrbitControls.js](https://raw.githubusercontent.com/mrdoob/three.js/r111/examples/jsm/controls/OrbitControls.js)
+* [jsm/three/GLTFLoader.js](https://github.com/mrdoob/three.js/blob/r111/examples/jsm/loaders/GLTFLoader.js)
 

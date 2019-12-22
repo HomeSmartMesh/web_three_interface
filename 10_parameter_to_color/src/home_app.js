@@ -1,6 +1,10 @@
 import * as three from "./three_app.js";
 import * as mouse from "./three_mouse.js";
 
+import dat from "../../jsm/dat.gui.module.js";
+
+import model_config from "../model_config.js";
+
 var rooms_light_state = {};
 var hue_mesh_name = {};
 var gui;
@@ -11,16 +15,14 @@ function send_custom_event(event_name,data){
 }
 
 function init(){
-	$.getJSON("home.json", function(home_data) {
-		three.init(on_load,home_data.glTF_model);
+	three.init(on_load,model_config.glTF_model);
 
-		window.addEventListener( 'mesh_mouse_enter', onMeshMouseEnter, false );
-		window.addEventListener( 'mesh_mouse_exit', onMeshMouseExit, false );
-		window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
-		window.addEventListener( 'mesh_touch_start', onMeshMouseDown, false );
-		window.addEventListener( 'hue_lights_on_startup', onHueStartup, false );
-		window.addEventListener( 'hue_light_state', onHueLightState, false );
-	});
+	window.addEventListener( 'mesh_mouse_enter', onMeshMouseEnter, false );
+	window.addEventListener( 'mesh_mouse_exit', onMeshMouseExit, false );
+	window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
+	window.addEventListener( 'mesh_touch_start', onMeshMouseDown, false );
+	window.addEventListener( 'hue_lights_on_startup', onHueStartup, false );
+	window.addEventListener( 'hue_light_state', onHueLightState, false );
 	
 }
 

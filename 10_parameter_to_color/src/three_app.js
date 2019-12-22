@@ -1,5 +1,8 @@
 //import "../libs/three/three.module.js";
 //import "../libs/three/OrbitControls.js";
+import * as THREE from "../../jsm/three/three.module.js";
+import { OrbitControls } from "../../jsm/three/OrbitControls.js";
+import { GLTFLoader } from "../../jsm/three/GLTFLoader.js";
 
 var camera, scene, renderer;
 var controls;
@@ -146,7 +149,7 @@ function create_renderer(){
 }
 
 function add_view_orbit(camera,renderer){
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	controls = new OrbitControls( camera, renderer.domElement );
 
 	//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
@@ -384,7 +387,7 @@ function apply_param_animations(gltf,scene){
 }
 
 function load_scene(user_on_load,gltf_filename){
-	var loader = new THREE.GLTFLoader();
+	var loader = new GLTFLoader();
 	loader.load(gltf_filename,
 		// called when the resource is loaded
 		gltf => {
