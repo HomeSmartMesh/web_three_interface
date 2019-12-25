@@ -122,9 +122,10 @@ function create_camera(){
 	var w = container.clientWidth;
 	var h = container.clientHeight;
 	camera = new THREE.PerspectiveCamera( 45, w / h, 0.01, 50 );
-	camera.position.y = 5;
-	camera.position.x = 0;
-	camera.position.z = 5;
+	const imported_camera = scene.getObjectByName("Camera");
+	//camera.position = imported_camera.position;
+	//camera.rotation = imported_camera.rotation;
+	camera.position.y = 5;	camera.position.x = 0;	camera.position.z = 5;
 	return camera;
 }
 
@@ -394,7 +395,7 @@ function load_scene(user_on_load,gltf_filename){
 			apply_custom_colors(scene);
 			apply_shadows(scene);
 			add_ambient_light();
-			camera = create_camera();
+			camera = create_camera(scene);
 			renderer = create_renderer();
 			orbit_control = add_view_orbit(camera,renderer);
 			control.init(scene,camera,orbit_control);
