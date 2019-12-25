@@ -1,5 +1,6 @@
 import * as three from "./three_app.js";
 import * as mouse from "./three_mouse.js";
+import * as control from "./three_control.js";
 
 import dat from "../../jsm/dat.gui.module.js";
 
@@ -8,6 +9,10 @@ import model_config from "../model_config.js";
 var rooms_light_state = {};
 var hue_mesh_name = {};
 var gui;
+let items_anim = {
+	Office:0,
+	Kitchen:0
+};
 
 function send_custom_event(event_name,data){
 	var event = new CustomEvent(event_name, {detail:data});
@@ -23,42 +28,30 @@ function init(){
 	window.addEventListener( 'mesh_touch_start', onMeshMouseDown, false );
 	window.addEventListener( 'hue_lights_on_startup', onHueStartup, false );
 	window.addEventListener( 'hue_light_state', onHueLightState, false );
-	window.addEventListener( 'mesh_config', onMeshConfig, false );
+	window.addEventListener( 'mesh_control', onMeshControl, false );
 	
 }
 
-function set_x(val){
-	three.getScene().getObjectByName("target").position.x = val;
+function set_office(l_val){
+	send_custom_event("three_color",{name:"Office", val:l_val});
 }
 
-function set_y(val){
-	three.getScene().getObjectByName("target").position.y = val;
-}
-
-function set_z(val){
-	three.getScene().getObjectByName("target").position.z = val;
+function set_kitchen(l_val){
+	send_custom_event("three_color",{name:"Kitchen", val:l_val});
 }
 
 function init_dat_gui(){
-	let config = {
-		x:0,
-		y:0,
-		z:0
-	};
 	gui = new dat.GUI();
-	let c_x = gui.add(config, 'x',0,2);
-	let c_y = gui.add(config, 'y',0,2);
-	let c_z = gui.add(config, 'z',0,2);
-	c_x.onChange(value => {set_x(value)});
-	c_y.onChange(value => {set_y(value)});
-	c_z.onChange(value => {set_z(value)});
-	
+	let c_o = gui.add(items_anim, 'Office',0.0,1.0).listen();
+	let c_c = gui.add(items_anim, 'Kitchen',0.0,1.0).listen();
+	c_o.onChange(value => {set_office(value)});
+	c_c.onChange(value => {set_kitchen(value)});
 }
 
 //in this callback, three is ready
 function on_load(){
 
-	//init_dat_gui();
+	init_dat_gui();
 
 	mouse.init(three.getCamera());
 	const mouse_mesh_list = three.getMouseMeshList();
@@ -120,13 +113,19 @@ function onMeshMouseDown(e){
 		const current_state = three.getHeatState(e.detail.name);
 		three.setHeatState(e.detail.name,!current_state);
 	}
-	if(e.detail.name == "target"){
-		config.run("target",e);
+	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
+		control.run(e.detail.name,e,items_anim[e.detail.name]);
 	}
 }
 
-function onMeshConfig(e){
-	console.log(`home_app> onMeshConfig() ${e.detail.name} has ${e.detail.config} at ${e.detail.val.toFixed(2)}`);
+function onMeshControl(e){
+	//console.log(`home_app> onMeshControl() ${e.detail.name} has ${e.detail.config} at ${e.detail.val.toFixed(2)}`);
+	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
+		if(e.detail.config == "slider"){
+			items_anim[e.detail.name] = e.detail.val;
+			send_custom_event("three_color",{name:e.detail.name, val:e.detail.val});
+		}
+	}
 }
 
 function onHueLightState(e){

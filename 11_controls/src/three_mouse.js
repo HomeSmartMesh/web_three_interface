@@ -12,6 +12,8 @@ var mouse = {
 	"object":""
 };
 
+var is_active = true;
+
 var mesh_list = [];
 
 function send_custom_event(event_name,data){
@@ -72,6 +74,9 @@ function process_mouse_event(event_name, event){
 }
 
 function onTouch(event){
+	if(!is_active){
+		return;
+	}
 	event.preventDefault();
 	console.log("onTouch",event);
 	if(event.type == "touchstart"){
@@ -83,15 +88,24 @@ function onTouch(event){
 }
 
 function onMouseDown(event){
+	if(!is_active){
+		return;
+	}
 	process_mouse_event("mesh_mouse_down",event);
 }
 
 function onMouseUp(){
+	if(!is_active){
+		return;
+	}
 	//console.log(`three_mouse> onMouseUp`);
 	send_custom_event("mesh_mouse_up",{});
 }
 
 function onMouseMove(event){
+	if(!is_active){
+		return;
+	}
 	process_mouse_event("mesh_mouse_move",event);
 }
 
@@ -116,4 +130,12 @@ function SetMeshList(l_mesh_list){
 	})
 }
 
-export{init,SetMeshList};
+function suspend(){
+	is_active = false;
+}
+
+function resume(){
+	is_active = true;
+}
+
+export{init,SetMeshList,suspend,resume};

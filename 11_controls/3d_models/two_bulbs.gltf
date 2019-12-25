@@ -105,7 +105,7 @@
         },
         {
             "mesh" : 2,
-            "name" : "Kitchen_Bulb",
+            "name" : "Office",
             "rotation" : [
                 0,
                 0,
@@ -120,7 +120,7 @@
         },
         {
             "mesh" : 3,
-            "name" : "Office_Bulb",
+            "name" : "Kitchen",
             "rotation" : [
                 0,
                 0,
@@ -147,6 +147,34 @@
                 ],
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.4000000059604645
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "Mat_Bronze",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.21586038172245026,
+                    0.1870506852865219,
+                    0.0073582823388278484,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        },
+        {
+            "doubleSided" : true,
+            "name" : "Mat_Green",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.1687239110469818,
+                    0.7991032600402832,
+                    0.07240734994411469,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
             }
         }
     ],
@@ -182,7 +210,8 @@
         {
             "extras" : {
                 "mouseEvent" : "true",
-                "config" : "slider"
+                "config" : "slider",
+                "mutateColor" : "801C35"
             },
             "name" : "Cone",
             "primitives" : [
@@ -192,14 +221,16 @@
                         "NORMAL" : 8,
                         "TEXCOORD_0" : 9
                     },
-                    "indices" : 10
+                    "indices" : 10,
+                    "material" : 1
                 }
             ]
         },
         {
             "extras" : {
                 "mouseEvent" : "true",
-                "config" : "slider"
+                "config" : "slider",
+                "mutateColor" : "8A47E7"
             },
             "name" : "Cone.001",
             "primitives" : [
@@ -209,7 +240,8 @@
                         "NORMAL" : 12,
                         "TEXCOORD_0" : 13
                     },
-                    "indices" : 10
+                    "indices" : 10,
+                    "material" : 2
                 }
             ]
         }

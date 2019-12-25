@@ -247,6 +247,46 @@ In this demo, the previous example is extended with another state. Any number of
 
 in order to have a coherent result, the sum of the given parameters is expected to be equal to one.
 
+# 11 controls
+
+<img src="./11_controls/media/demo.gif">
+
+In this demo, we see the user seemlessly alternating between the usage of a classical slider from the dat.gui and the new 3d slider control. The color ratio stays consistent when updating it by either method.
+
+## usage
+
+Updating the color is as simple as sending an event with just the object name and ratio between 0 and 1.
+
+```javascript
+    send_custom_event("three_color",{name:"Kitchen", val:0.3});
+```
+
+Using the 3d slide events are as simple as subscribing to the mesh control event
+
+```javascript
+	window.addEventListener( 'mesh_control', onMeshControl, false );
+```
+then using it on the callback
+```javascript
+function onMeshControl(e){
+    items_anim[e.detail.name] = e.detail.val;
+}
+```
+## config in blender
+This color vatiation concept has been simplified and labeled as "mutateColor", where no extra blender dummy material is required and a simple hex color field, which can be copied from the blender color picker.
+<img src="./11_controls/media/mutateColor_Structure.png">
+
+<img src="./11_controls/media/mutateColor_properties.png" width="500">
+
+## todo
+design:
+ * show mouse controllers (orbitControl, three_mouse, param_control)
+ * show control object slider placement relative to camera
+
+app:
+ - add touch and test
+ - add click and resolve click / control cases separtion
+ - refactor modules in separate npm repo (three_mouse, three_controls, three_app not the home_app)
 
 # Module Dependencies
 

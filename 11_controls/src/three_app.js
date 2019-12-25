@@ -1,12 +1,13 @@
 import * as THREE from "../../jsm/three/three.module.js";
 import { OrbitControls } from "../../jsm/three/OrbitControls.js";
 import { GLTFLoader } from "../../jsm/three/GLTFLoader.js";
-import * as config from "./three_control.js";
+import * as control from "./three_control.js";
 
 var camera, scene, renderer;
 var orbit_control;
 
 var anim_params = {};
+var color_params = {};
 
 function setBulb_MeshState(light_mesh,state_name,value){
 	if(state_name == "init"){
@@ -307,7 +308,7 @@ function init_obj_color(anim_obj){
 	set_obj_color(anim_obj,anim_obj.coeffs);
 }
 
-function apply_custom_view(scene){
+function apply_custom_states(scene){
 	scene.traverse(obj =>{
 		if(typeof obj.userData.state != "undefined"){
 			console.log(`${obj.name} has ${obj.children.length} states :`);
@@ -329,6 +330,18 @@ function apply_custom_view(scene){
 	} );
 }
 
+function apply_custom_colors(scene){
+	scene.traverse(obj =>{
+		if(typeof obj.userData.mutateColor != "undefined"){
+			color_params[obj.name] = {};
+			color_params[obj.name]["object"] = obj;
+			color_params[obj.name]["color1"] = obj.material.color.getHexString();
+			color_params[obj.name]["color2"] = obj.userData.mutateColor;
+			console.log(`${obj.name} can mutate color from ${obj.material.color.getHexString()} to ${obj.userData.mutateColor}`);
+		}
+	});
+}
+
 function apply_shadows(scene){
 	scene.traverse(obj =>{
 		if(obj.type == "Mesh"){
@@ -346,23 +359,7 @@ function apply_shadows(scene){
 	});
 }
 
-function back(){
-
-	gltf.animations.forEach(clip =>{
-
-		console.log(`clip '${clip.name}' :`);
-		clip.tracks.forEach(track =>{
-			console.log(` - KeyframeTrack '${track.name}' with ${track.times.length} times`);
-		});
-		const obj_mixer = new THREE.AnimationMixer(scene.getObjectByName("Axis"));
-		const animAction = obj_mixer.clipAction(clip);
-		animAction.play();
-		obj_mixer.setTime(2);
-
-	});
-}
-
-function apply_param_animations(gltf,scene){
+function apply_custom_animations(gltf,scene){
 	scene.traverse(obj =>{
 		if(obj.type == "Mesh"){
 			if(typeof obj.userData.parameter != "undefined"){
@@ -392,14 +389,15 @@ function load_scene(user_on_load,gltf_filename){
 		gltf => {
 			scene = gltf.scene;
 			apply_custom_visibility(scene);
-			apply_param_animations(gltf,scene);
-			apply_custom_view(scene);
+			apply_custom_animations(gltf,scene);
+			apply_custom_states(scene);
+			apply_custom_colors(scene);
 			apply_shadows(scene);
 			add_ambient_light();
 			camera = create_camera();
 			renderer = create_renderer();
 			orbit_control = add_view_orbit(camera,renderer);
-			config.init(scene,camera,orbit_control);
+			control.init(scene,camera,orbit_control);
 			user_on_load();
 			//setParam("Axis","pull",4);
 		},
@@ -413,7 +411,7 @@ function load_scene(user_on_load,gltf_filename){
 function onMeshMouseDown(e){
 	const hit_obj = scene.getObjectByName(e.detail.name);
 	if(typeof(hit_obj.userData.config) != "undefined"){
-		config.run(hit_obj.name,e);
+		//control.run(hit_obj.name,e);
 	}
 }
 
@@ -423,7 +421,8 @@ function init(on_load,glTF_filename){
 	load_scene(on_load,glTF_filename);
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	window.addEventListener( 'three_param', onParamUpdate, false );
+	window.addEventListener( 'three_anim', onParamUpdate, false );
+	window.addEventListener( 'three_color', onColorUpdate, false );
 	window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
 }
 
@@ -456,6 +455,23 @@ function getScene(){
 
 function getControl(){
 	return orbit_control;	
+}
+
+function onColorUpdate(e){
+	const obj_name = e.detail.name;
+	//console.log(`kitchen ${color_params[obj_name]}`);
+	if(typeof(color_params[obj_name]) != "undefined"){
+		const val = e.detail.val;
+		let weight_col1 = new THREE.Color(parseInt(color_params[obj_name].color1,16));
+		let weight_col2 = new THREE.Color(parseInt(color_params[obj_name].color2,16));
+		weight_col1.multiplyScalar(1-val);//0 gets full color 1
+		weight_col2.multiplyScalar(val);
+		let sum_color = new THREE.Color();
+		sum_color.addColors(weight_col1,weight_col2);
+		const obj = scene.getObjectByName(obj_name);
+		obj.material.color = sum_color;
+		//console.log(`setting ${obj_name} to color ${sum_color.getHexString()}`);
+	}
 }
 
 function onParamUpdate(e){
