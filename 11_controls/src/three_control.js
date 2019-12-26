@@ -49,8 +49,8 @@ function log_pos(obj){
     return `(${obj.position.x.toFixed(2)},${obj.position.y.toFixed(2)},${obj.position.z.toFixed(2)})`;
 }
 
-function run(l_name,e,start_val=0.5){
-    last_screen_y = e.detail.event.clientY;
+function run(l_name,clientY,start_val=0.5){
+    last_screen_y = clientY;
     const target = scene.getObjectByName(l_name);
     console.log(`running ${model_config.configurator.name} control at (${start_val.toFixed(2)}) on ${l_name} at y = ${target.position.y.toFixed(2)}`);
     let place = new THREE.Vector3(0,0,0);

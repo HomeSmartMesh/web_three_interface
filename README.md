@@ -255,7 +255,7 @@ in order to have a coherent result, the sum of the given parameters is expected 
 
 [11 Controls 3d slider - github directory](./11_controls)
 
-In this demo, we see the user seemlessly alternating between the usage of a classical slider from the dat.gui and the new 3d slider control. The color ratio stays consistent when updating it by either method.
+In this demo, we see the user seamlessly alternating between the usage of a classical slider from the dat.gui and the new 3d slider control. The color ratio stays consistent when updating it by either method.
 
 ## usage
 
@@ -290,6 +290,7 @@ design:
 app:
  - add click and resolve click / control cases separtion
  - refactor modules in separate npm repo (three_mouse, three_controls, three_app not the home_app)
+ - add cache-manifest
 
 # Module Dependencies
 

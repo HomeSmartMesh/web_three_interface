@@ -82,7 +82,7 @@ function onTouch(event){
 	if(event.type == "touchstart"){
 		var obj = get_mesh_intersect(event.targetTouches[0].clientX,event.targetTouches[0].clientY);
 		if ( obj != "") {
-			send_custom_object_event("mesh_touch_start",obj.name,obj);
+			send_custom_object_event("mesh_touch_start",obj.name,obj,event);
 		}
 	}
 }

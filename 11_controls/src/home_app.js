@@ -10,8 +10,8 @@ var rooms_light_state = {};
 var hue_mesh_name = {};
 var gui;
 let items_anim = {
-	Office:0,
-	Kitchen:0
+	Office:0.0,
+	Kitchen:0.0
 };
 
 function send_custom_event(event_name,data){
@@ -71,7 +71,8 @@ function on_load(){
 		}
 	});
 
-	//config.init(three.getScene(),three.getCamera(),three.getControl());
+	control.init(three.getScene(),three.getCamera(),three.getControl());
+	//control.init(scene,camera,orbit_control);
 
 	three.animate();
 
@@ -114,7 +115,14 @@ function onMeshMouseDown(e){
 		three.setHeatState(e.detail.name,!current_state);
 	}
 	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
-		control.run(e.detail.name,e,items_anim[e.detail.name]);
+		let y;
+		if(typeof(e.detail.event.clientY) != "undefined"){
+			y = e.detail.event.clientY;
+		}
+		else{
+			y = e.detail.event.targetTouches[0].clientY;
+		}
+		control.run(e.detail.name,y,items_anim[e.detail.name]);
 	}
 }
 

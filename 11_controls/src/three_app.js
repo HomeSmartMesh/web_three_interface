@@ -398,7 +398,6 @@ function load_scene(user_on_load,gltf_filename){
 			camera = create_camera(scene);
 			renderer = create_renderer();
 			orbit_control = add_view_orbit(camera,renderer);
-			control.init(scene,camera,orbit_control);
 			user_on_load();
 			//setParam("Axis","pull",4);
 		},
