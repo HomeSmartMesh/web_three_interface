@@ -2,17 +2,17 @@ import * as THREE from "../../jsm/three/three.module.js";
 import { GLTFLoader } from "../../jsm/three/GLTFLoader.js";
 
 import * as mouse from "./three_mouse.js";
-import model_config from "../model_config.js";
+import config from "../config.js";
 
 var scene;
 var camera;
 var orbit_control;
 var isActive = false;
 var active_name ="";
-var active_init_y;//active slider initial position
-var current_val;
+var current_val,start_val;
 var last_screen_y;
 var group,path,slider;
+var is_bullet_centered = config.control.is_bullet_centered_not_slider;
 
 function send_custom_event(event_name,data){
 	var event = new CustomEvent(event_name, {detail:data});
@@ -24,11 +24,11 @@ function init(l_scene,l_camera,l_orbit_control){
     camera = l_camera;
     orbit_control = l_orbit_control;
 	var loader = new GLTFLoader();
-    loader.load(model_config.configurator.file,
+    loader.load(config.control.file,
         gltf => {
             path = gltf.scene.getObjectByName("path");
             //path.visible = false;
-            slider = gltf.scene.getObjectByName(model_config.configurator.name);
+            slider = gltf.scene.getObjectByName(config.control.name);
             //slider.visible = false;
             group = new THREE.Group();
             group.add(slider);
@@ -49,25 +49,28 @@ function log_pos(obj){
     return `(${obj.position.x.toFixed(2)},${obj.position.y.toFixed(2)},${obj.position.z.toFixed(2)})`;
 }
 
-function run(l_name,clientY,start_val=0.5){
+function run(l_name,clientY,l_start_val=0.5){
+    start_val = l_start_val;
     last_screen_y = clientY;
     const target = scene.getObjectByName(l_name);
-    console.log(`running ${model_config.configurator.name} control at (${start_val.toFixed(2)}) on ${l_name} at y = ${target.position.y.toFixed(2)}`);
+    console.log(`running ${config.control.name} control at (${start_val.toFixed(2)}) on ${l_name} at y = ${target.position.y.toFixed(2)}`);
     let place = new THREE.Vector3(0,0,0);
-    place.addScaledVector(camera.position,0.3);
-    place.addScaledVector(target.position,0.7);
-    //slider.position.set(place.x,place.y,place.z);
+    const ratio = config.control.sliderPos_CamToObj_ratio;
+    place.addScaledVector(camera.position,ratio);
+    place.addScaledVector(target.position,1-ratio);
     group.position.set(place.x,place.y,place.z);
-    active_init_y = place.y;
+    if(is_bullet_centered)    {
+        const range = config.control.space_range;
+        path.position.y = (range/2) - start_val*range;
+    }
     group.visible = true;
-    //path.visible = true;
     document.getElementById('viewer').style.cursor = "none";
     mouse.suspend();
     orbit_control.saveState();
     orbit_control.enabled = false;
     isActive = true;
     active_name = l_name;
-    set_control_pos(start_val);//using active_init_y, active_name
+    set_control_pos(start_val);//using active_name
 }
 
 function set_control_pos(target_val){
@@ -78,18 +81,23 @@ function set_control_pos(target_val){
     else if(current_val > 1){
         current_val = 1;
     }
-    const space_range = 3;
-    //slider.position.y = active_init_y - (space_range/2) + current_val*space_range;
-    slider.position.y = -(space_range/2) + current_val*space_range;
-    send_custom_event("mesh_control",{name:active_name,config:model_config.configurator.name,val:current_val});
+    const range = config.control.space_range;
+    if(is_bullet_centered){
+        slider.position.y = (current_val-start_val) * range;
+    }
+    else{
+        slider.position.y = -(range/2) + current_val*range;
+    }
+    send_custom_event("mesh_control",{name:active_name,config:config.control.name,val:current_val});
 }
 
 function process_move(y){
     if(isActive){
         const shift_screen = y - last_screen_y;
         last_screen_y = y;
-        const screen_sensitivity = 150.0;
-        set_control_pos(current_val - shift_screen/screen_sensitivity);
+        const screen_sensitivity = config.control.screen_move_sensitivity;
+        const shift_val = shift_screen/screen_sensitivity;
+        set_control_pos(current_val - shift_val);
     }
 }
 
@@ -110,7 +118,7 @@ function onMouseUp(e){
         orbit_control.reset();
         isActive = false;
         const target = scene.getObjectByName(active_name);
-        console.log(`releasing ${model_config.configurator.name} control at (${current_val.toFixed(2)}) from ${active_name} at y = ${target.position.y.toFixed(2)}`);
+        console.log(`releasing ${config.control.name} control at (${current_val.toFixed(2)}) from ${active_name} at y = ${target.position.y.toFixed(2)}`);
     }
 }
 

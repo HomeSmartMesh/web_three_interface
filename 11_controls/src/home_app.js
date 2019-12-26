@@ -4,14 +4,14 @@ import * as control from "./three_control.js";
 
 import dat from "../../jsm/dat.gui.module.js";
 
-import model_config from "../model_config.js";
+import config from "../config.js";
 
 var rooms_light_state = {};
 var hue_mesh_name = {};
 var gui;
 let items_anim = {
-	Office:0.0,
-	Kitchen:0.0
+	Office:0.2,
+	Kitchen:0.5
 };
 
 function send_custom_event(event_name,data){
@@ -20,7 +20,7 @@ function send_custom_event(event_name,data){
 }
 
 function init(){
-	three.init(on_load,model_config.glTF_model);
+	three.init(on_load,config.glTF_model);
 
 	window.addEventListener( 'mesh_mouse_enter', onMeshMouseEnter, false );
 	window.addEventListener( 'mesh_mouse_exit', onMeshMouseExit, false );
@@ -46,6 +46,8 @@ function init_dat_gui(){
 	let c_c = gui.add(items_anim, 'Kitchen',0.0,1.0).listen();
 	c_o.onChange(value => {set_office(value)});
 	c_c.onChange(value => {set_kitchen(value)});
+	set_office(items_anim.Office);
+	set_kitchen(items_anim.Kitchen);
 }
 
 //in this callback, three is ready
