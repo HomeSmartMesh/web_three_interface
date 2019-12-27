@@ -13,7 +13,7 @@ Now back to the description of this repository content :
 
 # Overal concept
 
-<img src="./media/properties_control.png">
+<img src="./media/prop_simple.png">
 
 
 ## 3d objects properties
@@ -41,9 +41,7 @@ On activation of the control, new objects such as a slider pop up in the scene a
 
 ```javascript
 	window.addEventListener( 'mesh_control', onMeshControl, false );
-```
-then using it on the callback
-```javascript
+
 function onMeshControl(e){
     console.log(`update of ${e.detail.name} value to ${e.detail.val}`);
 }
@@ -320,6 +318,13 @@ This color vatiation concept has been simplified and labeled as "mutateColor", w
 
 <img src="./11_controls/media/mutateColor_properties.png" width="500">
 
+# advanced control
+
+<img src="./media/properties_control.png">
+
+in this diagram we see the options to control a single value linearly.
+It is planned to expand the functionalities to multi linear states and states interpolation
+
 # Module Dependencies
 
 * [jsm/dat.gui.module.js](https://raw.githubusercontent.com/dataarts/dat.gui/v0.7.6/build/dat.gui.module.js)
@@ -329,6 +334,9 @@ This color vatiation concept has been simplified and labeled as "mutateColor", w
 * [jsm/three/GLTFLoader.js](https://github.com/mrdoob/three.js/blob/r111/examples/jsm/loaders/GLTFLoader.js)
 
 ## features plan
+scene
+* load camera from gltf
+
 control
  * add click and hold events (not just down)
  * display slider direction facing the camera
