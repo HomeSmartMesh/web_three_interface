@@ -11,7 +11,8 @@ var hue_mesh_name = {};
 var gui;
 let items_anim = {
 	Office:0.2,
-	Kitchen:0.5
+	Kitchen:0.5,
+	center_bullet:control.get_bullet_centered()
 };
 
 function send_custom_event(event_name,data){
@@ -44,8 +45,10 @@ function init_dat_gui(){
 	gui = new dat.GUI();
 	let c_o = gui.add(items_anim, 'Office',0.0,1.0).listen();
 	let c_c = gui.add(items_anim, 'Kitchen',0.0,1.0).listen();
+	let change_center = gui.add(items_anim, 'center_bullet',true);
 	c_o.onChange(value => {set_office(value)});
 	c_c.onChange(value => {set_kitchen(value)});
+	change_center.onChange(value => {control.set_bullet_centered(value)});
 	set_office(items_anim.Office);
 	set_kitchen(items_anim.Kitchen);
 }

@@ -1,15 +1,53 @@
 # Introduction
 This repo contains webGL Three.js based interface demos for interactions with 3d data using mouse and touch.
 
-# Interaction with real lights
+# Real use case
 
-This repository is intended as boiler plate to showcase the interactions with a 3d home model. For abstraction purpose, it does not include any connection to real devices or network libraries. Such usage is developed within this project below that has the same development model and license:
+This repository has boilerplates samples. A real use case example is a 3d home model. While the focus of this repo is the 3d interactions only, this repo is used in another project linked below where it is connected to real devices and network libraries.
 
 https://github.com/HomeSmartMesh/smart_home_3d_webapp
 
-<img src="./smart_home_3d_webapp/demo1.gif">
+<img src="./media/demo1.gif">
 
 Now back to the description of this repository content :
+
+# Overal concept
+
+<img src="./media/properties_control.png">
+
+
+## 3d objects properties
+Manipulation of properties such as mesh animation and color. This control can operate from an external interface of through internal 3d mouse events.
+
+call to modify a property:
+```javascript
+    send_custom_event("three_color",{name:"Kitchen", val:0.3});
+```
+
+## 3d mouse events
+Events such as hover, click and long press. These events uses rays to match the 3d objects meshes.
+
+user handling of 3d mouse events:
+```javascript
+    window.addEventListener( 'mesh_touch_start', onMeshTouch, false );
+
+function onMeshMouseDown(e){
+    console.log(`Mesh Touch on ${e.detail.name}`);
+}
+```
+
+## 3d slider control
+On activation of the control, new objects such as a slider pop up in the scene and takes over the mouse control. While the user is acting on the control, the control is producing events. The whole cycle can be as short as the user touching the 3d element, the slider popup with the bullet already under the user's finger, the user shifts slightly to the new desired position and on touch release the slider goes away.
+
+```javascript
+	window.addEventListener( 'mesh_control', onMeshControl, false );
+```
+then using it on the callback
+```javascript
+function onMeshControl(e){
+    console.log(`update of ${e.detail.name} value to ${e.detail.val}`);
+}
+```
 
 # 01 mouse hover on mesh
 <img src="./01_mesh_mouse_on_hover/media/demo.gif" width="600">
@@ -249,7 +287,7 @@ in order to have a coherent result, the sum of the given parameters is expected 
 
 # 11 controls
 
-<img src="./11_controls/media/demo2.gif">
+<img src="./11_controls/media/demo3.gif">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/11_controls/)
 
@@ -282,16 +320,6 @@ This color vatiation concept has been simplified and labeled as "mutateColor", w
 
 <img src="./11_controls/media/mutateColor_properties.png" width="500">
 
-## todo
-design:
- * show mouse controllers (orbitControl, three_mouse, param_control)
- * show control object slider placement relative to camera
-
-app:
- - add click and resolve click / control cases separtion
- - refactor modules in separate npm repo (three_mouse, three_controls, three_app not the home_app)
- - add cache-manifest
-
 # Module Dependencies
 
 * [jsm/dat.gui.module.js](https://raw.githubusercontent.com/dataarts/dat.gui/v0.7.6/build/dat.gui.module.js)
@@ -300,3 +328,17 @@ app:
 * [jsm/three/OrbitControls.js](https://raw.githubusercontent.com/mrdoob/three.js/r111/examples/jsm/controls/OrbitControls.js)
 * [jsm/three/GLTFLoader.js](https://github.com/mrdoob/three.js/blob/r111/examples/jsm/loaders/GLTFLoader.js)
 
+## features plan
+control
+ * add click and hold events (not just down)
+ * display slider direction facing the camera
+ * auto-adjust slider min and max distance not just ratio
+ * multi touch control, using multiple slider instances
+ * inherit min max adjusted parameters in slider display
+
+doc
+ * show control object slider placement relative to camera
+
+code
+ * refactor modules in separate npm repo (three_mouse, three_controls, three_app not the home_app)
+ * add cache-manifest

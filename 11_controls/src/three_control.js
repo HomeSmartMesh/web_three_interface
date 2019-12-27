@@ -63,6 +63,9 @@ function run(l_name,clientY,l_start_val=0.5){
         const range = config.control.space_range;
         path.position.y = (range/2) - start_val*range;
     }
+    else{
+        path.position.y = 0;
+    }
     group.visible = true;
     document.getElementById('viewer').style.cursor = "none";
     mouse.suspend();
@@ -122,4 +125,12 @@ function onMouseUp(e){
     }
 }
 
-export{init,run};
+function set_bullet_centered(val){
+    is_bullet_centered = val;
+}
+
+function get_bullet_centered(val){
+    return is_bullet_centered;
+}
+
+export{init,run,get_bullet_centered,set_bullet_centered};
