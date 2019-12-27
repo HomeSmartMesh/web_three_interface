@@ -11,7 +11,7 @@ https://github.com/HomeSmartMesh/smart_home_3d_webapp
 
 Now back to the description of this repository content :
 
-# Overal concept
+# Concept
 
 <img src="./media/prop_simple.png">
 
