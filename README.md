@@ -21,7 +21,7 @@ Manipulation of properties such as mesh animation and color. This control can op
 
 call to modify a property:
 ```javascript
-    send_custom_event("three_color",{name:"Kitchen", val:0.3});
+send_custom_event("three_color",{name:"Kitchen", val:0.3});
 ```
 
 ## 3d mouse events
@@ -29,7 +29,7 @@ Events such as hover, click and long press. These events uses rays to match the 
 
 user handling of 3d mouse events:
 ```javascript
-    window.addEventListener( 'mesh_touch_start', onMeshTouch, false );
+window.addEventListener( 'mesh_touch_start', onMeshTouch, false );
 
 function onMeshMouseDown(e){
     console.log(`Mesh Touch on ${e.detail.name}`);
@@ -40,7 +40,7 @@ function onMeshMouseDown(e){
 On activation of the control, new objects such as a slider pop up in the scene and takes over the mouse control. While the user is acting on the control, the control is producing events. The whole cycle can be as short as the user touching the 3d element, the slider popup with the bullet already under the user's finger, the user shifts slightly to the new desired position and on touch release the slider goes away.
 
 ```javascript
-	window.addEventListener( 'mesh_control', onMeshControl, false );
+window.addEventListener( 'mesh_control', onMeshControl, false );
 
 function onMeshControl(e){
     console.log(`update of ${e.detail.name} value to ${e.detail.val}`);
@@ -350,3 +350,11 @@ doc
 code
  * refactor modules in separate npm repo (three_mouse, three_controls, three_app not the home_app)
  * add cache-manifest
+
+```javascript
+send_custom_event("three_param",{name:"Kitchen", color:0.3});
+send_custom_event("three_param",{name:"Kitchen", light:0.3});
+send_custom_event("three_param",{name:"Kitchen", anim:0.3});
+send_custom_event("three_param",{name:"Kitchen", pull:0.3});
+send_custom_event("three_param",{name:"Kitchen", push:0.3});
+```
