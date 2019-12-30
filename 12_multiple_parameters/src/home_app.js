@@ -25,11 +25,13 @@ function init(){
 
 	window.addEventListener( 'mesh_mouse_enter', onMeshMouseEnter, false );
 	window.addEventListener( 'mesh_mouse_exit', onMeshMouseExit, false );
-	window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
-	window.addEventListener( 'mesh_touch_start', onMeshMouseDown, false );
+	//window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
+	//window.addEventListener( 'mesh_touch_start', onMeshMouseDown, false );
 	window.addEventListener( 'hue_lights_on_startup', onHueStartup, false );
 	window.addEventListener( 'hue_light_state', onHueLightState, false );
 	window.addEventListener( 'mesh_control', onMeshControl, false );
+	window.addEventListener( 'mesh_click', onMeshClick, false );
+	window.addEventListener( 'mesh_hold', onMeshHold, false );
 	
 }
 
@@ -41,9 +43,9 @@ function init_dat_gui(){
 	change_emit.onChange(value => {send_custom_event("three_param",{name:"Kitchen", emissive:value});});
 	change_light.onChange(value => {send_custom_event("three_param",{name:"Kitchen", light:value});});
 	change_color.onChange(value => {send_custom_event("three_param",{name:"Kitchen", color:value});});
-	send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Kitchen_Emissive});
-	send_custom_event("three_param",{name:"Kitchen", light:items_anim.Kitchen_Light});
-	send_custom_event("three_param",{name:"Kitchen", color:items_anim.Kitchen_Color});
+	send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Emissive});
+	send_custom_event("three_param",{name:"Kitchen", light:items_anim.Light});
+	send_custom_event("three_param",{name:"Kitchen", color:items_anim.Color});
 }
 
 //in this callback, three is ready
@@ -99,7 +101,25 @@ function swap_light_state(name){
 }
 
 function onMeshMouseDown(e){
-	console.log(`Mesh Mouse Down on ${e.detail.name}`);
+}
+
+function onMeshControl(e){
+	//console.log(`home_app> onMeshControl() ${e.detail.name} has ${e.detail.config} at ${e.detail.val.toFixed(2)}`);
+	if(e.detail.name === "Kitchen"){
+		if(e.detail.config == "slider"){
+			items_anim[e.detail.name] = e.detail.val;
+			items_anim.Emissive = e.detail.val*0.5;
+			items_anim.Light = e.detail.val*0.8;
+			items_anim.Color = e.detail.val;
+			send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Emissive});
+			send_custom_event("three_param",{name:"Kitchen", light:items_anim.Light});
+			send_custom_event("three_param",{name:"Kitchen", color:items_anim.Color});
+		}
+	}
+}
+
+function onMeshClick(e){
+	console.log(`home_app> mesh_click on ${e.detail.name}`);
 	if(e.detail.type == "light"){
 		const current_state = three.getLightState(e.detail.name);
 		three.setBulbState(e.detail.name,"switch",!current_state);
@@ -112,25 +132,31 @@ function onMeshMouseDown(e){
 		const current_state = three.getHeatState(e.detail.name);
 		three.setHeatState(e.detail.name,!current_state);
 	}
-	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
-		let y;
-		if(typeof(e.detail.event.clientY) != "undefined"){
-			y = e.detail.event.clientY;
+
+	if(e.detail.name === "Kitchen"){
+		if(items_anim.Light < 0.4){
+			items_anim.Emissive = 0.5;
+			items_anim.Light = 0.8;
+			items_anim.Color = 1;
+			send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Emissive});
+			send_custom_event("three_param",{name:"Kitchen", light:items_anim.Light});
+			send_custom_event("three_param",{name:"Kitchen", color:items_anim.Color});
 		}
 		else{
-			y = e.detail.event.targetTouches[0].clientY;
+			items_anim.Emissive = 0;
+			items_anim.Light = 0;
+			items_anim.Color = 0;
+			send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Emissive});
+			send_custom_event("three_param",{name:"Kitchen", light:items_anim.Light});
+			send_custom_event("three_param",{name:"Kitchen", color:items_anim.Color});
 		}
-		control.run(e.detail.name,y,items_anim[e.detail.name]);
 	}
+
 }
 
-function onMeshControl(e){
-	//console.log(`home_app> onMeshControl() ${e.detail.name} has ${e.detail.config} at ${e.detail.val.toFixed(2)}`);
-	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
-		if(e.detail.config == "slider"){
-			items_anim[e.detail.name] = e.detail.val;
-			send_custom_event("three_param",{name:e.detail.name, color:e.detail.val});
-		}
+function onMeshHold(e){
+	if(e.detail.name === "Kitchen"){
+		control.run(e.detail.name,e.detail.y,items_anim.Color);
 	}
 }
 

@@ -66,6 +66,10 @@ function run(l_name,clientY,l_start_val=0.5){
     else{
         path.position.y = 0;
     }
+    const box_target = new THREE.Box3().setFromObject(target);
+    const box_slider = new THREE.Box3().setFromObject(path);
+    const scale = (box_target.max.y - box_target.min.y) / (box_slider.max.y - box_slider.min.y);
+    group.scale.set(scale,scale,scale);
     group.visible = true;
     document.getElementById('viewer').style.cursor = "none";
     mouse.suspend();
@@ -114,6 +118,7 @@ function onTouchMove(e){
 
 function onMouseUp(e){
     if(isActive){
+        group.scale.set(1,1,1);
         group.visible = false;
         document.getElementById('viewer').style.cursor = "default";
         mouse.resume();

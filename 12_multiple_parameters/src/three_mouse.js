@@ -3,13 +3,16 @@ import {
 	Vector2
 } from "../../jsm/three/three.module.js";
 
+import config from "../config.js";
 
 var camera;
 
 var raycaster;
 var mouse = {
 	"is_inside_object":false,
-	"object":""
+	"object":"",
+	"eventStart":0,
+	"status":"idle"
 };
 
 var is_active = true;
@@ -39,10 +42,10 @@ function get_mesh_intersect(l_x,l_y){
 
 function send_custom_object_event(event_name,object_name,obj,event){
 	if(obj.userData.type == "light"){
-		send_custom_event(event_name,{ type: obj.userData.type, name: object_name, hue:obj.userData.hue, event:event});
+		send_custom_event(event_name,{ type: obj.userData.type, name: object_name, hue:obj.userData.hue,event:event});
 	}
 	else{
-		send_custom_event(event_name,{ type: obj.userData.type, name: object_name, event:event});
+		send_custom_event(event_name,{ type: obj.userData.type, name: object_name,event:event});
 	}
 }
 
@@ -59,10 +62,12 @@ function process_mouse_event(event_name, event){
 			mouse.is_inside_object = false;
 		}
 		mouse.object = obj.name;
+		mouse.object_type = obj.userData.type;
 		if(!mouse.is_inside_object){
 			send_custom_event("mesh_mouse_enter",{ type: obj.userData.type, name: mouse.object});
 		}
 		mouse.is_inside_object = true;
+		mouse.y = event.clientY;
 		send_custom_object_event(event_name,mouse.object,obj,event);
 	}
 	else{
@@ -73,17 +78,34 @@ function process_mouse_event(event_name, event){
 	}
 }
 
+function eventDelay(){
+	//console.log(`event mouse status = ${mouse.status}`);
+	if(mouse.status === "started"){
+		send_custom_event("mesh_hold",{name:mouse.object,type:mouse.object_type,y:mouse.y});
+		mouse.status = "idle";
+	}
+}
+
 function onTouch(event){
 	if(!is_active){
 		return;
 	}
+	mouse.eventStart = Date.now();
+	setTimeout(eventDelay,config.mouse.click_hold_delay_ms);
 	event.preventDefault();
-	console.log("onTouch",event);
+	//console.log("onTouch",event);
 	if(event.type == "touchstart"){
 		var obj = get_mesh_intersect(event.targetTouches[0].clientX,event.targetTouches[0].clientY);
 		if ( obj != "") {
+			mouse.is_inside_object = true;
+			mouse.object = obj.name;
+			mouse.object_type = obj.userData.type;
+			mouse.y = event.targetTouches[0].clientY;
 			send_custom_object_event("mesh_touch_start",obj.name,obj,event);
 		}
+	}
+	if(mouse.is_inside_object){
+		mouse.status = "started";
 	}
 }
 
@@ -91,15 +113,25 @@ function onMouseDown(event){
 	if(!is_active){
 		return;
 	}
+	mouse.eventStart = Date.now();
+	setTimeout(eventDelay,config.mouse.click_hold_delay_ms);
 	process_mouse_event("mesh_mouse_down",event);
+	if(mouse.is_inside_object){
+		mouse.status = "started";
+	}
 }
 
 function onMouseUp(){
 	if(!is_active){
 		return;
 	}
-	//console.log(`three_mouse> onMouseUp`);
+	mouse.is_inside_object = false;
 	send_custom_event("mesh_mouse_up",{});
+	if(mouse.status === "started"){
+		//console.log(`three_mouse> onMouseUp --> click on ${mouse.object} ; status = ${mouse.status}`);
+		send_custom_event("mesh_click",{name:mouse.object,type:mouse.object_type});
+	}
+	mouse.status = "idle";
 }
 
 function onMouseMove(event){
@@ -118,8 +150,9 @@ function init(l_camera) {
 	raycaster = new Raycaster();
 	container.addEventListener( 'mousemove', onMouseMove, false );
 	container.addEventListener( 'mousedown', onMouseDown, false );
-	container.addEventListener( 'mouseup', onMouseUp, false );
 	container.addEventListener( 'touchstart', onTouch, false );
+	container.addEventListener( 'mouseup', onMouseUp, false );
+    container.addEventListener('touchend', onMouseUp, false );
 	
 }
 

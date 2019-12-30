@@ -181,7 +181,6 @@ Note the logic of group light click is defined to switch off all lights if any o
 
 [07 interactive heating - github directory](./07_interactive_heating)
 
-## Features
 Added features in this demo:
 * Shadows
 * Complete Home lighting setup
@@ -318,6 +317,28 @@ This color vatiation concept has been simplified and labeled as "mutateColor", w
 
 <img src="./11_controls/media/mutateColor_properties.png" width="500">
 
+
+# 12 multiple parameters
+
+<img src="./12_multiple_parameters/media/demo3.gif">
+
+[Live demo](https://homesmartmesh.github.io/web_three_interface/12_multiple_parameters/)
+
+[12 multiple parameters - github directory](./12_multiple_parameters)
+
+In this demo, the user is interacting with the light bulb in two ways, clicks for quick actions full switch on or off for all parameters, or with the hold (>600 ms) to smoothly adjust the value with the 3d slider.
+
+## Usage
+```javascript
+	window.addEventListener( 'mesh_control', onMeshControl, false );
+	window.addEventListener( 'mesh_click', onMeshClick, false );
+	window.addEventListener( 'mesh_hold', onMeshHold, false );
+
+    send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Emissive});
+    send_custom_event("three_param",{name:"Kitchen", light:items_anim.Light});
+    send_custom_event("three_param",{name:"Kitchen", color:items_anim.Color});
+``` 
+
 # advanced control
 
 <img src="./media/properties_control.png">
@@ -333,6 +354,11 @@ It is planned to expand the functionalities to multi linear states and states in
 * [jsm/three/OrbitControls.js](https://raw.githubusercontent.com/mrdoob/three.js/r111/examples/jsm/controls/OrbitControls.js)
 * [jsm/three/GLTFLoader.js](https://github.com/mrdoob/three.js/blob/r111/examples/jsm/loaders/GLTFLoader.js)
 
+# Features
+* mouse and touch for mesh hover and down
+* click event and hold event (configurable click speed)
+* 3d slider size adjusted on controlled object's size
+
 ## features plan
 scene
 * load camera from gltf
@@ -340,11 +366,8 @@ scene
 * bake shadow textures with blender according to sunlight position
 
 control
- * add click and hold events (not just down)
  * display slider direction facing the camera
- * auto-adjust slider min and max distance not just ratio
  * multi touch control, using multiple slider instances
- * inherit min max adjusted parameters in slider display
 
 doc
  * show control object slider placement relative to camera
