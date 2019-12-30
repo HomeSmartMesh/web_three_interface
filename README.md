@@ -320,7 +320,7 @@ This color vatiation concept has been simplified and labeled as "mutateColor", w
 
 # 12 multiple parameters
 
-<img src="./12_multiple_parameters/media/demo3.gif">
+<img src="./12_multiple_parameters/media/demo.gif">
 
 [Live demo](https://homesmartmesh.github.io/web_three_interface/12_multiple_parameters/)
 
