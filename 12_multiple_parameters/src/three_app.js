@@ -1,121 +1,12 @@
 import * as THREE from "../../jsm/three/three.module.js";
 import { OrbitControls } from "../../jsm/three/OrbitControls.js";
 import { GLTFLoader } from "../../jsm/three/GLTFLoader.js";
-import * as control from "./three_control.js";
 
 var camera, scene, renderer;
 var orbit_control;
 
 var anim_params = {};
 var color_params = {};
-
-function setBulb_MeshState(light_mesh,state_name,value){
-	if(state_name == "init"){
-		if(value){
-			var emit = new THREE.Color( 0, 0.2, 0.2 );
-		}
-		else{
-			var emit = new THREE.Color( 0, 0, 0 );
-		}
-	}
-	else if(state_name == "switch"){
-		if(value){
-			var emit = new THREE.Color( 0, 0.5, 0 );
-		}
-		else{
-			var emit = new THREE.Color( 0, 0, 0 );
-		}
-	}
-	else{
-		if(state_name == "highlight"){
-			if(value){
-				var emit = new THREE.Color( 1, 0, 0 );
-			}
-			else{
-				var emit = new THREE.Color( 0, 0, 0 );
-			}
-		}
-		else{
-			var emit = light_mesh.material.emissive;
-		}
-	}
-		var material = new THREE.MeshPhongMaterial( {
-			color: light_mesh.material.color,
-			emissive: emit,
-			side: light_mesh.material.side,
-			flatShading: light_mesh.material.flatShading
-		});
-		light_mesh.material = material;
-		//console.log(`${name} has emissive at ${emit.getHexString()}`);
-}
-
-function setBulb_LightState(light,state_name,value){
-	if(value){
-		//TODO custom Property for light does not appear on SpotLight object and child is Object3D without userData
-		light.intensity = 10;
-	}
-	else{
-		light.intensity = 0;
-	}
-}
-
-function getLightState(name){
-	const light_mesh = scene.getObjectByName(name);
-	const light = light_mesh.children[0].children[0];
-	if(light.intensity > 0){
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
-function setBulbState(name,state_name,value){
-	const light_mesh = scene.getObjectByName(name);
-	setBulb_MeshState(light_mesh,state_name,value);
-
-	if(state_name == "switch"){
-			if(light_mesh.children[0].children[0] != "undefined"){
-			const light = light_mesh.children[0].children[0];
-			setBulb_LightState(light,state_name,value);
-		}
-		else{
-			console.log(`light mesh ${name} has no grand child`);
-		}
-	}
-}
-
-/**
- * 
- * @param {*} name : the light group name
- * @return true, if any of the lights are on, otherwise false
- */
-function getLightGroupState(name){
-	const light_group_mesh = scene.getObjectByName(name);
-	for(let mesh_id in light_group_mesh.children){
-		const mesh = light_group_mesh.children[mesh_id];
-		if(mesh.userData.type == "light"){
-			if(getLightState(mesh.name)){
-				return true;
-			}
-		}
-	};
-	return false;
-}
-
-function setBulbGroupState(name,state_name,value){
-	const light_group_mesh = scene.getObjectByName(name);
-	setBulb_MeshState(light_group_mesh,state_name,value);
-	if(state_name == "switch"){
-			setBulb_LightState(light_group_mesh,state_name,value);
-	}
-
-	light_group_mesh.children.forEach(mesh =>{
-		if(mesh.userData.type == "light"){
-			setBulbState(mesh.name,state_name,value);
-		}
-	});
-}
 
 function create_camera(){
 	var container = document.getElementById('viewer');
@@ -181,21 +72,8 @@ function onWindowResize() {
 
 function add_ambient_light(){
 
-	var dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
-	dirLight.position.set( 1, 4, 0 );
-	dirLight.castShadow = true;
-
-	dirLight.shadow.mapSize.width = 2048;
-	dirLight.shadow.mapSize.height = 2048;
-	var d = 6;
-	dirLight.shadow.camera.left = - d;
-	dirLight.shadow.camera.right = d;
-	dirLight.shadow.camera.top = d;
-	dirLight.shadow.camera.bottom = - d;
-	dirLight.shadow.camera.far = 7;
-	dirLight.shadow.bias = - 0.01;
-
-	scene.add( dirLight );
+	var light = new THREE.AmbientLight( 0xB0B0B0 );
+	scene.add( light );
 }
 
 function get_scene_box(scene){
@@ -235,7 +113,7 @@ function center_scene(scene){
 	console.log(`now scene boxed from (${box.min.x},${box.min.y},${box.min.z}) to (${box.max.x},${box.max.y},${box.max.z}) with size (${s.x},${s.y},${s.z})`);
 }
 
-function apply_custom_visibility(scene){
+function init_custom_visibility(scene){
 	scene.traverse(obj =>{
 		//though only meshes are taken as input, here everything is shifted as lights shall shift too
 		//hierarchical structure does move end leaves multiple times, so selection of meshes only moved as workaround
@@ -247,6 +125,11 @@ function apply_custom_visibility(scene){
 	} );
 }
 
+/**
+ * To be deprecated
+ * @param {*} obj 
+ * @param {*} view_name 
+ */
 function set_obj_state(obj,view_name){
 	console.log(`three_app> set_obj_state() ${obj.name} to : ${view_name}`);
 	obj.userData.state = view_name;
@@ -282,34 +165,8 @@ function get_obj_states(obj_name){
 	}
 }
 
-function set_obj_color(anim_obj,target_coeffs){
-	let sum_Color = new THREE.Color(0,0,0);
-	for(const name in anim_obj.ref_colors){
-		const ref_color = anim_obj.ref_colors[name];
-		//console.log(`  - ref color of '${name}' (${ref_color.r},${ref_color.g},${ref_color.b}) has coeff : ${target_coeffs[name]}`);
-		let part_color = ref_color.clone();
-		part_color.multiplyScalar(target_coeffs[name]);
-		sum_Color.add(part_color);
-	}
-	const obj = anim_obj.object
-	obj.children[0].material.color = sum_Color;
-	//console.log(`three_app> set_obj_color() ${obj.name} to (${sum_Color.r},${sum_Color.g},${sum_Color.b})`);
-}
-
-function init_obj_color(anim_obj){
-	const obj = anim_obj["object"];
-	anim_obj.ref_colors = {};
-	anim_obj.coeffs = {};
-	obj.children.forEach(child =>{
-		anim_obj.ref_colors[child.name] = child.material.color;
-		anim_obj.coeffs[child.name] = obj.userData[child.name];
-		child.visible = false;
-	});
-	obj.children[0].visible = true;
-	set_obj_color(anim_obj,anim_obj.coeffs);
-}
-
-function apply_custom_states(scene){
+//to be deprecated
+function init_custom_states(scene){
 	scene.traverse(obj =>{
 		if(typeof obj.userData.state != "undefined"){
 			console.log(`${obj.name} has ${obj.children.length} states :`);
@@ -331,7 +188,7 @@ function apply_custom_states(scene){
 	} );
 }
 
-function apply_custom_colors(scene){
+function init_custom_colors(scene){
 	scene.traverse(obj =>{
 		if(typeof obj.userData.mutateColor != "undefined"){
 			color_params[obj.name] = {};
@@ -343,7 +200,7 @@ function apply_custom_colors(scene){
 	});
 }
 
-function apply_shadows(scene){
+function init_shadows(scene){
 	scene.traverse(obj =>{
 		if(obj.type == "Mesh"){
 			if(obj.userData.type == "wall"){
@@ -360,7 +217,7 @@ function apply_shadows(scene){
 	});
 }
 
-function apply_custom_animations(gltf,scene){
+function init_custom_animations(gltf,scene){
 	scene.traverse(obj =>{
 		if(obj.type == "Mesh"){
 			if(typeof obj.userData.parameter != "undefined"){
@@ -389,11 +246,11 @@ function load_scene(user_on_load,gltf_filename){
 		// called when the resource is loaded
 		gltf => {
 			scene = gltf.scene;
-			apply_custom_visibility(scene);
-			apply_custom_animations(gltf,scene);
-			apply_custom_states(scene);
-			apply_custom_colors(scene);
-			apply_shadows(scene);
+			init_custom_visibility(scene);
+			init_custom_animations(gltf,scene);
+			init_custom_states(scene);
+			init_custom_colors(scene);
+			init_shadows(scene);
 			add_ambient_light();
 			camera = create_camera(scene);
 			renderer = create_renderer();
@@ -408,22 +265,13 @@ function load_scene(user_on_load,gltf_filename){
 	);
 }
 
-function onMeshMouseDown(e){
-	const hit_obj = scene.getObjectByName(e.detail.name);
-	if(typeof(hit_obj.userData.config) != "undefined"){
-		//control.run(hit_obj.name,e);
-	}
-}
-
 function init(on_load,glTF_filename){
 	console.log("three_app> init()");
 
 	load_scene(on_load,glTF_filename);
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	window.addEventListener( 'three_anim', onParamUpdate, false );
-	window.addEventListener( 'three_color', onColorUpdate, false );
-	window.addEventListener( 'mesh_mouse_down', onMeshMouseDown, false );
+	window.addEventListener( 'three_param', onParamUpdate, false );
 }
 
 function animate() {
@@ -457,11 +305,25 @@ function getControl(){
 	return orbit_control;	
 }
 
-function onColorUpdate(e){
-	const obj_name = e.detail.name;
-	//console.log(`kitchen ${color_params[obj_name]}`);
+function update_light(params){
+	const parent = scene.getObjectByName(params.name);
+	parent.traverse(obj =>{
+		if(["PointLight","SpotLight","DirectionalLight"].includes(obj.type)){
+			obj.intensity = params.light * parent.userData.maxLight;
+		}
+	});
+}
+
+function update_emissive(params){
+	const obj = scene.getObjectByName(params.name);
+	obj.material.emissive = new THREE.Color(params.emissive,params.emissive,params.emissive);
+}
+
+function update_color(params){
+	const obj_name = params.name;
+	//console.log(`${obj_name} color update`);
 	if(typeof(color_params[obj_name]) != "undefined"){
-		const val = e.detail.val;
+		const val = params.color;
 		let weight_col1 = new THREE.Color(parseInt(color_params[obj_name].color1,16));
 		let weight_col2 = new THREE.Color(parseInt(color_params[obj_name].color2,16));
 		weight_col1.multiplyScalar(1-val);//0 gets full color 1
@@ -474,12 +336,16 @@ function onColorUpdate(e){
 	}
 }
 
-function onParamUpdate(e){
-
-	const obj_name = e.detail.name;
-	const val = e.detail.val;
+function update_anim(params){
+	const obj_name = params.name;
+	const val = params.val;
+	if(typeof(anim_params[obj_name]) == "undefined"){
+		console.warn(`no anim params for ${obj_name}`);
+		console.log(params);
+		return;
+	}
 	if(anim_params[obj_name].type == "mixer"){
-		const param_name = e.detail.param;
+		const param_name = params.param;
 		const mixer = anim_params[obj_name][param_name].mixer;
 		const duration = anim_params[obj_name][param_name].duration;
 		let time = val * duration;
@@ -496,7 +362,23 @@ function onParamUpdate(e){
 		set_obj_state(obj,val);
 	}
 	else if(anim_params[obj_name].type == "color"){
-		set_obj_color(anim_params[obj_name],e.detail);
+		set_obj_color(anim_params[obj_name],params);
+	}
+}
+
+function onParamUpdate(e){
+	const params = e.detail;
+	if(typeof(params.color) != "undefined"){
+		update_color(params);
+	}
+	else if(typeof(params.emissive) != "undefined"){
+		update_emissive(params);
+	}
+	else if(typeof(params.light) != "undefined"){
+		update_light(params);
+	}
+	else{
+		update_anim(params);
 	}
 }
 
@@ -504,12 +386,7 @@ export{
 		init,
 		animate,
 		getMouseMeshList,
-		setBulbState,
-		setBulbGroupState,
-		getLightState,
-		getLightGroupState,
 		getCamera,
 		getScene,
-		getControl,
-		get_obj_states
+		getControl
 	};

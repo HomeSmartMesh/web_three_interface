@@ -336,6 +336,8 @@ It is planned to expand the functionalities to multi linear states and states in
 ## features plan
 scene
 * load camera from gltf
+* adjust camera to scene scale (clip and distance)
+* bake shadow textures with blender according to sunlight position
 
 control
  * add click and hold events (not just down)

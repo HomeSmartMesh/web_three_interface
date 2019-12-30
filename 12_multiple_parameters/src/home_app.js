@@ -10,9 +10,9 @@ var rooms_light_state = {};
 var hue_mesh_name = {};
 var gui;
 let items_anim = {
-	Office:0.2,
-	Kitchen:0.5,
-	center_bullet:control.get_bullet_centered()
+	Emissive:0.1,
+	Light:0.2,
+	Color:0.5
 };
 
 function send_custom_event(event_name,data){
@@ -33,24 +33,17 @@ function init(){
 	
 }
 
-function set_office(l_val){
-	send_custom_event("three_color",{name:"Office", val:l_val});
-}
-
-function set_kitchen(l_val){
-	send_custom_event("three_color",{name:"Kitchen", val:l_val});
-}
-
 function init_dat_gui(){
 	gui = new dat.GUI();
-	let c_o = gui.add(items_anim, 'Office',0.0,1.0).listen();
-	let c_c = gui.add(items_anim, 'Kitchen',0.0,1.0).listen();
-	let change_center = gui.add(items_anim, 'center_bullet',true);
-	c_o.onChange(value => {set_office(value)});
-	c_c.onChange(value => {set_kitchen(value)});
-	change_center.onChange(value => {control.set_bullet_centered(value)});
-	set_office(items_anim.Office);
-	set_kitchen(items_anim.Kitchen);
+	let change_emit = gui.add(items_anim, 'Emissive',0.0,1.0).listen();
+	let change_light = gui.add(items_anim, 'Light',0.0,1.0).listen();
+	let change_color = gui.add(items_anim, 'Color',0.0,1.0).listen();
+	change_emit.onChange(value => {send_custom_event("three_param",{name:"Kitchen", emissive:value});});
+	change_light.onChange(value => {send_custom_event("three_param",{name:"Kitchen", light:value});});
+	change_color.onChange(value => {send_custom_event("three_param",{name:"Kitchen", color:value});});
+	send_custom_event("three_param",{name:"Kitchen", emissive:items_anim.Kitchen_Emissive});
+	send_custom_event("three_param",{name:"Kitchen", light:items_anim.Kitchen_Light});
+	send_custom_event("three_param",{name:"Kitchen", color:items_anim.Kitchen_Color});
 }
 
 //in this callback, three is ready
@@ -136,7 +129,7 @@ function onMeshControl(e){
 	if(["Kitchen","Office"].indexOf(e.detail.name) >= 0){
 		if(e.detail.config == "slider"){
 			items_anim[e.detail.name] = e.detail.val;
-			send_custom_event("three_color",{name:e.detail.name, val:e.detail.val});
+			send_custom_event("three_param",{name:e.detail.name, color:e.detail.val});
 		}
 	}
 }

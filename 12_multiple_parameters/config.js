@@ -1,6 +1,6 @@
 export default
 {
-    "glTF_model":"./3d_models/two_big_bulbs.gltf",
+    "glTF_model":"./3d_models/one_bulb.gltf",
     "control":{
         "file":"./3d_models/configurator.gltf",
         "name":"slider",
